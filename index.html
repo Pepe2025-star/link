@@ -660,8 +660,45 @@
 
                     <div class="modal-direccion-body">
 
-                        <!-- Contenido para ENTREGA A DOMICILIO -->
-                        <div id="modalContentDomicilio" class="hidden">
+                        <!-- 1) Datos de contacto (compartido para domicilio y local) -->
+                        <div class="modal-form-section modal-form-section-first">
+                            <div class="form-section-title">
+                                <span class="form-section-num">1</span>
+                                <span class="form-section-label">Tus datos de contacto</span>
+                            </div>
+                            <p class="hint-entrega mt-0">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Los datos marcados con <span class="req-asterisk">*</span> son obligatorios para completar el pedido.
+                            </p>
+                            <div class="row">
+                                <div class="col-12 col-lg-6 col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label><i class="fas fa-user"></i> ¿Cuál es tu nombre? <span class="req-asterisk">*</span></label>
+                                        <input id="txtComplemento" type="text" class="form-control" placeholder="Tu nombre completo" required oninput="cardapio.metodos.actualizarEstadoBotonRevisar()" />
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-6 col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label><i class="fas fa-phone"></i> Teléfono <span class="req-asterisk">*</span></label>
+                                        <div class="telefono-input-wrap">
+                                            <select id="ddlCountryCode" class="form-control-country" aria-label="Código de país">
+                                                <!-- Se llena por JS -->
+                                            </select>
+                                            <input id="txtCEP" type="tel" inputmode="numeric" class="form-control form-control-telefono" placeholder="Número de teléfono" required oninput="cardapio.metodos.validarTelefonoEnVivo(); cardapio.metodos.actualizarEstadoBotonRevisar()" />
+                                        </div>
+                                        <p class="telefono-feedback" id="telefonoFeedback"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2) Contenido para ENTREGA A DOMICILIO -->
+                        <div id="modalContentDomicilio" class="modal-form-section hidden">
+                            <div class="form-section-title">
+                                <span class="form-section-num">2</span>
+                                <span class="form-section-label">Dirección de entrega <span class="req-asterisk">*</span></span>
+                            </div>
                             <p class="hint-entrega mt-0">
                                 <i class="fas fa-exclamation-circle"></i>
                                 Los campos marcados con <span class="req-asterisk">*</span> son obligatorios para completar tu dirección.
@@ -670,14 +707,14 @@
                                 <div class="col-12 col-lg-7 col-md-7 col-sm-12">
                                     <div class="form-group">
                                         <label><i class="fas fa-road"></i> Dirección (calle) <span class="req-asterisk">*</span></label>
-                                        <input id="txtEndereco" type="text" class="form-control" placeholder="Calle, entre calles, edificio..." required />
+                                        <input id="txtEndereco" type="text" class="form-control" placeholder="Calle, entre calles, edificio..." required oninput="cardapio.metodos.actualizarEstadoBotonRevisar()" />
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-lg-5 col-md-5 col-sm-12">
                                     <div class="form-group">
                                         <label><i class="fas fa-map-signs"></i> Reparto / Barrio <span class="req-asterisk">*</span></label>
-                                        <input id="txtBairro" type="text" class="form-control" placeholder="Nombre del reparto" required />
+                                        <input id="txtBairro" type="text" class="form-control" placeholder="Nombre del reparto" required oninput="cardapio.metodos.actualizarEstadoBotonRevisar()" />
                                     </div>
                                 </div>
 
@@ -693,8 +730,12 @@
                             </div>
                         </div>
 
-                        <!-- Contenido para RECOGER EN EL LOCAL -->
-                        <div id="modalContentLocal" class="hidden">
+                        <!-- 2) Contenido para RECOGER EN EL LOCAL -->
+                        <div id="modalContentLocal" class="modal-form-section hidden">
+                            <div class="form-section-title">
+                                <span class="form-section-num">2</span>
+                                <span class="form-section-label">Punto de recogida</span>
+                            </div>
                             <div class="info-local info-local-modal">
                                 <div class="info-local-icon"><i class="fas fa-store"></i></div>
                                 <div class="info-local-body">
@@ -729,40 +770,7 @@
                             </div>
                         </div>
 
-                        <!-- Datos de contacto (compartido para domicilio y local) -->
-                        <div class="modal-form-section">
-                            <div class="form-section-title">
-                                <span class="form-section-num">2</span>
-                                <span class="form-section-label">Tus datos de contacto</span>
-                            </div>
-                            <p class="hint-entrega mt-0">
-                                <i class="fas fa-exclamation-circle"></i>
-                                Los datos marcados con <span class="req-asterisk">*</span> son obligatorios para completar el pedido.
-                            </p>
-                            <div class="row">
-                                <div class="col-12 col-lg-6 col-md-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label><i class="fas fa-user"></i> ¿Cuál es tu nombre? <span class="req-asterisk">*</span></label>
-                                        <input id="txtComplemento" type="text" class="form-control" placeholder="Tu nombre completo" required />
-                                    </div>
-                                </div>
-
-                                <div class="col-12 col-lg-6 col-md-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label><i class="fas fa-phone"></i> Teléfono <span class="req-asterisk">*</span></label>
-                                        <div class="telefono-input-wrap">
-                                            <select id="ddlCountryCode" class="form-control-country" aria-label="Código de país">
-                                                <!-- Se llena por JS -->
-                                            </select>
-                                            <input id="txtCEP" type="tel" inputmode="numeric" class="form-control form-control-telefono" placeholder="Número de teléfono" required oninput="cardapio.metodos.validarTelefonoEnVivo()" />
-                                        </div>
-                                        <p class="telefono-feedback" id="telefonoFeedback"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Método de pago (compartido para domicilio y local) -->
+                        <!-- 3) Método de pago (compartido para domicilio y local) -->
                         <div class="modal-form-section">
                             <div class="form-section-title">
                                 <span class="form-section-num">3</span>
@@ -888,7 +896,7 @@
             <a onclick="cardapio.metodos.carregarEndereco()" class="btn btn-yellow float-right" id="btnEtapaPedido">
                 Continuar
             </a>
-            <a onclick="cardapio.metodos.resumoPedido()" class="btn btn-yellow float-right hidden" id="btnEtapaEndereco">
+            <a onclick="cardapio.metodos.resumoPedido()" class="btn btn-yellow float-right hidden btn-disabled" id="btnEtapaEndereco" aria-disabled="true">
                 Revisar pedido
             </a>
             <a href="#" class="btn btn-yellow float-right hidden" id="btnEtapaResumo" target="_blank">
