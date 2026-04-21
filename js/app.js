@@ -6,8 +6,11 @@ var cardapio = {};
 
 var MEU_CARRINHO = [];
 
-// Tipo de entrega seleccionado: 'domicilio' | 'local'. Por defecto "local".
-var TIPO_ENTREGA = 'local';
+// Tipo de entrega seleccionado: 'domicilio' | 'local' | null. Por defecto ninguno.
+var TIPO_ENTREGA = null;
+
+// Número de orden actual (se genera al pasar al resumen del pedido)
+var NUMERO_ORDEN = null;
 
 // Municipio seleccionado para la entrega a domicilio
 var MUNICIPIO_SELECCIONADO = null;
@@ -521,6 +524,9 @@ cardapio.metodos = {
             $("#btnEtapaEndereco").addClass('hidden');
             $("#btnEtapaResumo").addClass('hidden');
             $("#btnVoltar").addClass('hidden');
+
+            // mostrar Subtotal / Total en el carrito
+            $(".m-footer .container-total").removeClass('hidden');
         }
         
         if (etapa == 2) {
@@ -538,6 +544,9 @@ cardapio.metodos = {
             $("#btnEtapaEndereco").removeClass('hidden');
             $("#btnEtapaResumo").addClass('hidden');
             $("#btnVoltar").removeClass('hidden');
+
+            // en esta etapa NO se muestran Subtotal ni Total
+            $(".m-footer .container-total").addClass('hidden');
         }
 
         if (etapa == 3) {
@@ -556,6 +565,9 @@ cardapio.metodos = {
             $("#btnEtapaEndereco").addClass('hidden');
             $("#btnEtapaResumo").removeClass('hidden');
             $("#btnVoltar").removeClass('hidden');
+
+            // los totales ya se muestran dentro del resumen, ocultamos la barra inferior
+            $(".m-footer .container-total").addClass('hidden');
         }
 
     },
@@ -749,14 +761,17 @@ cardapio.metodos = {
         cardapio.metodos.carregarEtapa(2);
         cardapio.metodos.renderMunicipios();
 
-        // por defecto está preseleccionada la opción "local" en el HTML.
-        // Si ya se hizo una elección previa, restaurarla visualmente.
-        $(`input[name='tipoEntrega'][value='${TIPO_ENTREGA}']`).prop('checked', true);
-        $(".tipo-entrega-card").removeClass('selected');
-        $(`.tipo-entrega-card[data-tipo='${TIPO_ENTREGA}']`).addClass('selected');
-
-        // refrescar vista de la entrega seleccionada
-        cardapio.metodos.refrescarVistaEntrega();
+        // no preseleccionar ninguna opción por defecto
+        if (TIPO_ENTREGA) {
+            $(`input[name='tipoEntrega'][value='${TIPO_ENTREGA}']`).prop('checked', true);
+            $(".tipo-entrega-card").removeClass('selected');
+            $(`.tipo-entrega-card[data-tipo='${TIPO_ENTREGA}']`).addClass('selected');
+            cardapio.metodos.refrescarVistaEntrega();
+        } else {
+            $("input[name='tipoEntrega']").prop('checked', false);
+            $(".tipo-entrega-card").removeClass('selected');
+            $("#resumenDireccionConfirmada").addClass('hidden');
+        }
 
     },
 
@@ -828,14 +843,14 @@ cardapio.metodos = {
             $icon.attr('class', 'fas fa-motorcycle');
             $titulo.text('Dirección de entrega');
             $subtitulo.text('Completa los datos para entregarte el pedido a domicilio');
-            $btnTxt.text('Guardar dirección');
+            $btnTxt.text('Confirmar pedido');
 
             $("#modalContentDomicilio").removeClass('hidden');
         } else {
             $icon.attr('class', 'fas fa-store');
             $titulo.text('Recoger en el local');
             $subtitulo.text('Revisa la información del punto de recogida');
-            $btnTxt.text('Entendido, continuar');
+            $btnTxt.text('Confirmar pedido');
 
             $("#modalContentLocal").removeClass('hidden');
         }
@@ -861,46 +876,81 @@ cardapio.metodos = {
     },
     cerrarModalDireccion: () => cardapio.metodos.cerrarModalEntrega(),
 
+    // Valida datos de contacto y método de pago (sección compartida dentro del modal)
+    validarDatosContactoModal: () => {
+
+        let complemento = $("#txtComplemento").val().trim();
+        if (complemento.length <= 0) {
+            cardapio.metodos.mensagem('El campo "¿Cuál es tu nombre?" es obligatorio.');
+            $("#txtComplemento").trigger('focus');
+            return false;
+        }
+
+        let tel = cardapio.metodos.validarTelefono();
+        if (!tel.ok) {
+            cardapio.metodos.mensagem(tel.msg);
+            cardapio.metodos.validarTelefonoEnVivo();
+            $("#txtCEP").trigger('focus');
+            return false;
+        }
+
+        // método de pago: se valida que haya uno seleccionado
+        let metodoChecked = $("input[name='metodoPago']:checked").val();
+        if (!metodoChecked) {
+            cardapio.metodos.mensagem('Selecciona un método de pago.');
+            return false;
+        }
+
+        return true;
+    },
+
     // Botón "Confirmar/Guardar" del modal
     confirmarEntrega: () => {
+
+        // primero valida lo específico del tipo de entrega
         if (TIPO_ENTREGA === 'domicilio') {
-            cardapio.metodos.guardarDireccion();
+            let endereco = $("#txtEndereco").val().trim();
+            let bairro = $("#txtBairro").val().trim();
+
+            if (endereco.length <= 0) {
+                cardapio.metodos.mensagem('El campo Dirección (calle) es obligatorio.');
+                $("#txtEndereco").trigger('focus');
+                return;
+            }
+            if (bairro.length <= 0) {
+                cardapio.metodos.mensagem('El campo Reparto / Barrio es obligatorio.');
+                $("#txtBairro").trigger('focus');
+                return;
+            }
+            if (!MUNICIPIO_SELECCIONADO) {
+                cardapio.metodos.mensagem('Selecciona el municipio de La Habana para calcular el envío.');
+                return;
+            }
+        } else if (TIPO_ENTREGA !== 'local') {
+            cardapio.metodos.mensagem('Selecciona cómo deseas recibir tu pedido.');
+            return;
+        }
+
+        // después valida datos de contacto y método de pago (comunes a ambos)
+        if (!cardapio.metodos.validarDatosContactoModal()) {
+            return;
+        }
+
+        // cerrar modal y reflejar
+        cardapio.metodos.cerrarModalEntrega();
+        if (TIPO_ENTREGA === 'domicilio') {
+            cardapio.metodos.actualizarResumenDireccionConfirmada();
+            cardapio.metodos.mensagem('Dirección guardada correctamente.', 'green');
         } else {
-            // local: solo cerrar y mostrar el resumen
-            cardapio.metodos.cerrarModalEntrega();
             cardapio.metodos.actualizarResumenEntregaLocal();
             cardapio.metodos.mensagem('Recogida en el local confirmada.', 'green');
         }
+        cardapio.metodos.carregarValores();
     },
 
-    // Valida y guarda la dirección desde el modal (domicilio)
+    // (compatibilidad) guardar dirección desde el modal
     guardarDireccion: () => {
-
-        let endereco = $("#txtEndereco").val().trim();
-        let bairro = $("#txtBairro").val().trim();
-
-        if (endereco.length <= 0) {
-            cardapio.metodos.mensagem('El campo Dirección (calle) es obligatorio.');
-            $("#txtEndereco").trigger('focus');
-            return;
-        }
-
-        if (bairro.length <= 0) {
-            cardapio.metodos.mensagem('El campo Reparto / Barrio es obligatorio.');
-            $("#txtBairro").trigger('focus');
-            return;
-        }
-
-        if (!MUNICIPIO_SELECCIONADO) {
-            cardapio.metodos.mensagem('Selecciona el municipio de La Habana para calcular el envío.');
-            return;
-        }
-
-        // todo ok, cerrar y reflejar
-        cardapio.metodos.cerrarModalEntrega();
-        cardapio.metodos.actualizarResumenDireccionConfirmada();
-        cardapio.metodos.carregarValores();
-        cardapio.metodos.mensagem('Dirección guardada correctamente.', 'green');
+        cardapio.metodos.confirmarEntrega();
     },
 
     // Muestra el resumen de la dirección confirmada (domicilio) debajo de las tarjetas
@@ -1072,6 +1122,16 @@ cardapio.metodos = {
         $("#txtCEP").focus();
     },
 
+    // genera un número de orden único (distinto en cada pedido)
+    generarNumeroOrden: () => {
+        let d = new Date();
+        let pad = (n, l = 2) => String(n).padStart(l, '0');
+        let fecha = `${String(d.getFullYear()).slice(-2)}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+        let hora = `${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        let rand = Math.floor(Math.random() * 9000) + 1000;
+        return `FH-${fecha}-${hora}-${rand}`;
+    },
+
     // validação antes de prosseguir para a etapa 3
     resumoPedido: () => {
 
@@ -1084,10 +1144,10 @@ cardapio.metodos = {
         let uf = $("#ddlUf").val().trim();
         let complemento = $("#txtComplemento").val().trim();
 
-        // nombre obligatorio
+        // nombre obligatorio (por si el modal no se confirmó)
         if (complemento.length <= 0) {
-            cardapio.metodos.mensagem('El campo "¿Cuál es tu nombre?" es obligatorio.');
-            $("#txtComplemento").focus();
+            cardapio.metodos.mensagem('Completa tus datos de contacto antes de continuar.');
+            cardapio.metodos.abrirModalEntrega();
             return;
         }
 
@@ -1095,8 +1155,7 @@ cardapio.metodos = {
         let tel = cardapio.metodos.validarTelefono();
         if (!tel.ok) {
             cardapio.metodos.mensagem(tel.msg);
-            cardapio.metodos.validarTelefonoEnVivo();
-            $("#txtCEP").focus();
+            cardapio.metodos.abrirModalEntrega();
             return;
         }
 
@@ -1143,6 +1202,9 @@ cardapio.metodos = {
             };
         }
 
+        // generar un nuevo número de orden único para este pedido
+        NUMERO_ORDEN = cardapio.metodos.generarNumeroOrden();
+
         cardapio.metodos.carregarEtapa(3);
         cardapio.metodos.carregarResumo();
 
@@ -1173,6 +1235,9 @@ cardapio.metodos = {
 
     // carrega a etapa de Resumo do pedido
     carregarResumo: () => {
+
+        // --- NÚMERO DE ORDEN ---
+        $("#lblNumeroOrden").text(NUMERO_ORDEN || '—');
 
         // --- PRODUCTOS ---
         $("#listaItensResumo").html('');
@@ -1290,6 +1355,9 @@ cardapio.metodos = {
         let texto = '';
 
         texto += '*NUEVO PEDIDO - Cabrera\'s Shop*\n';
+        if (NUMERO_ORDEN) {
+            texto += `*N° de orden:* ${NUMERO_ORDEN}\n`;
+        }
         texto += separador + '\n\n';
 
         // --- Productos (desglosados con precio unitario, cantidad y subtotal) ---
