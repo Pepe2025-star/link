@@ -1,0 +1,997 @@
+/* ================================================================
+   PANEL DE CONTROL - LÓGICA PRINCIPAL
+   ================================================================ */
+(function () {
+    'use strict';
+
+    // ------------------------------------------------------------
+    // CONFIGURACIÓN
+    // ------------------------------------------------------------
+    var STORAGE_KEY = 'cshop_admin_config_v1';
+    var SESSION_KEY = 'cshop_admin_session_v1';
+
+    // Credenciales (requeridas por el proyecto). Cualquier intento debe coincidir EXACTAMENTE.
+    var CREDS = { u: 'root', p: 'habanaya2029' };
+
+    // ------------------------------------------------------------
+    // VALORES POR DEFECTO (extraídos del código original)
+    // ------------------------------------------------------------
+    var DEFAULT_CATEGORIAS = {
+        "burgers":     { nome: "Antimicrobianos",  icone: "fas fa-capsules" },
+        "pizzas":      { nome: "Antiinflamatorios", icone: "fas fa-pills" },
+        "churrasco":   { nome: "Antialérgicos",    icone: "fas fa-allergies" },
+        "steaks":      { nome: "Antihipertensivo", icone: "fas fa-heartbeat" },
+        "bebidas":     { nome: "Digestivos",       icone: "fas fa-prescription-bottle" },
+        "sobremesas":  { nome: "Dermatológicos",   icone: "fas fa-hand-holding-medical" },
+        "outros":      { nome: "Otros",            icone: "fas fa-notes-medical" }
+    };
+
+    var DEFAULT_MUNICIPIOS = [
+        { id: 'habana-vieja',    nome: 'Habana Vieja',           costo: 200 },
+        { id: 'centro-habana',   nome: 'Centro Habana',          costo: 200 },
+        { id: 'plaza',           nome: 'Plaza de la Revolución', costo: 250 },
+        { id: 'cerro',           nome: 'Cerro',                  costo: 250 },
+        { id: 'diez-de-octubre', nome: 'Diez de Octubre',        costo: 250 },
+        { id: 'playa',           nome: 'Playa',                  costo: 350 },
+        { id: 'marianao',        nome: 'Marianao',               costo: 400 },
+        { id: 'la-lisa',         nome: 'La Lisa',                costo: 450 },
+        { id: 'boyeros',         nome: 'Boyeros',                costo: 400 },
+        { id: 'arroyo-naranjo',  nome: 'Arroyo Naranjo',         costo: 400 },
+        { id: 'san-miguel',      nome: 'San Miguel del Padrón',  costo: 350 },
+        { id: 'guanabacoa',      nome: 'Guanabacoa',             costo: 400 },
+        { id: 'regla',           nome: 'Regla',                  costo: 300 },
+        { id: 'habana-del-este', nome: 'Habana del Este',        costo: 450 },
+        { id: 'cotorro',         nome: 'Cotorro',                costo: 500 }
+    ];
+
+    var DEFAULT_CELULAR = '5355135487';
+    var DEFAULT_CELULAR_DISPLAY = '(53) 5513-5487';
+
+    // ------------------------------------------------------------
+    // MANIFIESTO DE ARCHIVOS DEL SITIO (para exportar)
+    // ------------------------------------------------------------
+    var FILE_MANIFEST = [
+        'README.md',
+        'admin.html',
+        'index.html',
+        'pareja-joven-india-carrito-compras-o-carretilla-llena-comestibles-verduras-frutas-foto-cuerpo-entero-aislado-sobre-pared-blanca_466689-7614.avif',
+        'css/admin.css',
+        'css/animate.css',
+        'css/bootstrap.min.css',
+        'css/fontawesome.css',
+        'css/main.css',
+        'css/menu.css',
+        'css/modal_cpanel.css',
+        'css/responsivo.css',
+        'css/style_cpanel.css',
+        'fonts/Poppins-Medium.otf',
+        'fonts/Poppins-Regular.otf',
+        'fonts/fa-brands-400.eot',
+        'fonts/fa-brands-400.svg',
+        'fonts/fa-brands-400.ttf',
+        'fonts/fa-brands-400.woff',
+        'fonts/fa-brands-400.woff2',
+        'fonts/fa-regular-400.eot',
+        'fonts/fa-regular-400.svg',
+        'fonts/fa-regular-400.ttf',
+        'fonts/fa-regular-400.woff',
+        'fonts/fa-regular-400.woff2',
+        'fonts/fa-solid-900.eot',
+        'fonts/fa-solid-900.svg',
+        'fonts/fa-solid-900.ttf',
+        'fonts/fa-solid-900.woff',
+        'fonts/fa-solid-900.woff2',
+        'img/Copia icone-pedido.svg',
+        'img/ana.jpg',
+        'img/ana_cpanel.jpg',
+        'img/background_cpanel.jpg',
+        'img/banner-entrega.png',
+        'img/bg-icons-1.png',
+        'img/bg-icons-2.png',
+        'img/cardapio/Antialérgicos/Ciproheptadina.jpg',
+        'img/cardapio/Antialérgicos/Loratadina.jpg',
+        'img/cardapio/Antidepresivos/Captopril.png',
+        'img/cardapio/Antidepresivos/ENALAPRIL-MALEATO-20MG-CAJA-POR-20-TABLETAS-CON-BLISTER.jpg',
+        'img/cardapio/Antidepresivos/Furosemida.jpg',
+        'img/cardapio/Dermatológicos/04IU-Nistaderm-300x300.png',
+        'img/cardapio/Dermatológicos/69298876654432239---2-.png',
+        'img/cardapio/Dermatológicos/Clotrimazol-crema.png',
+        'img/cardapio/Dermatológicos/KETOLEF_2__CREMA_X_15_G.png',
+        'img/cardapio/Dermatológicos/Permetrina.jpg',
+        'img/cardapio/Dermatológicos/aciclovir-crema.jpg',
+        'img/cardapio/Dermatológicos/mentholán con diclofenaco jalea.jpg',
+        'img/cardapio/Dermatológicos/miconazol crema.jpg',
+        'img/cardapio/Dermatológicos/piojín unguento.jpg',
+        'img/cardapio/Digestivos/Pack-RANITIDINA-comp.jpg',
+        'img/cardapio/Digestivos/Suspensi-n-Pepto-Bismol-Sabor-Original-473-ml-1-3238.jpg',
+        'img/cardapio/Digestivos/mentholán con diclofenaco jalea.jpg',
+        'img/cardapio/Digestivos/omeprazol.jpg',
+        'img/cardapio/antiinflamatorios/Diclofenaco + Paracetamol.jpg',
+        'img/cardapio/antiinflamatorios/IBUPROFENO-MK-TAB-800MG-CJAX-30UND-81001065-1.jpg',
+        'img/cardapio/antiinflamatorios/Ibuprofeno (jarabe).jpg',
+        'img/cardapio/antiinflamatorios/Paracetamol (jarabe).jpg',
+        'img/cardapio/antiinflamatorios/ZUnv5y5wXYF3KGipZn8Qu6pnhzAIMflTmMKqcdKL.png',
+        'img/cardapio/antiinflamatorios/paracetamol.jpg',
+        'img/cardapio/burguers/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg',
+        'img/cardapio/burguers/CIPROFLOXACINO-500-MG.jpg',
+        'img/cardapio/burguers/Cefalexina.jpg',
+        'img/cardapio/burguers/METRONIDAZOL-500MG.jpg',
+        'img/cardapio/burguers/Secnidazol.jpg',
+        'img/cardapio/burguers/albendazol.png',
+        'img/cardapio/burguers/amoxicilina suspención.jpg',
+        'img/cardapio/burguers/amoxicilina.jpg',
+        'img/cardapio/burguers/cefalexina suspension.jpg',
+        'img/cardapio/burguers/doxiciclina.jpg',
+        'img/cardapio/burguers/hydrocortisone cream.png',
+        'img/cardapio/burguers/lasante_azitromicina_tabletas.png',
+        'img/cardapio/burguers/mebendazol.jpg',
+        'img/cardapio/burguers/nistatina-suspension.jpg',
+        'img/cardapio/burguers/pexels-cottonbro-10610417.jpg',
+        'img/cardapio/burguers/sulfaprim.jpg',
+        'img/cardapio/outros/Amitriptilina 25 mg.jpg',
+        'img/cardapio/outros/Amitriptilina.jpg',
+        'img/cardapio/outros/Aspirina.jpg',
+        'img/cardapio/outros/Heat Wrap compresse chauffante.jpg',
+        'img/cardapio/outros/Iron spring valley.jpg',
+        'img/cardapio/outros/Prednisolona.jpg',
+        'img/cardapio/outros/VITAMINA-C-GOTAS-100-MG--COASP_L.jpg',
+        'img/cardapio/outros/Vitamina C (jarabe).jpg',
+        'img/cardapio/outros/Vitamina C.jpg',
+        'img/cardapio/outros/aceite-higado-de-bacalao-x10-tabletas-1.jpg',
+        'img/cardapio/outros/acido-folico.jpg',
+        'img/cardapio/outros/ibuprofeno(pomo).jpg',
+        'img/cardapio/outros/mentol Arthritis & muscle.jpg',
+        'img/cardapio/outros/mentol muscle rub.jpg',
+        'img/cardapio/outros/super b-complex.jpg',
+        'img/cardapio/outros/vitamin-b-12-es.jpg',
+        'img/cardapio/outros/vitamina-c-natural-life-1000-mg-100-tabletas-vitamina-c-natural-life-1000-mg-100-tabletas.jpg',
+        'img/cardapio/outros/Óvulos Clotrimazol+nistatina.jpg',
+        'img/cardapio/outros/Óvulos Clotrimazol.jpg',
+        'img/cardapio/productos agotados/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg',
+        'img/cardapio/productos agotados/AZITROMICINA.png',
+        'img/cardapio/productos agotados/agotado.png',
+        'img/cardapio/productos agotados/amitriptilina.jpg',
+        'img/cardapio/productos agotados/aviso-producto-agotado-1.jpg',
+        'img/cardapio/productos nuevos pronto/360_F_26606957_OkBZrC2SCbxo6oiRHFBMSSn42HT3v719.jpg',
+        'img/cardapio/productos nuevos pronto/images.jpg',
+        'img/diego.jpg',
+        'img/icone-carrinho-vazio.svg',
+        'img/icone-delivery.png',
+        'img/icone-delivery.svg',
+        'img/icone-delivery1.png',
+        'img/icone-pedido.png',
+        'img/icone-pedido.svg',
+        'img/icone-qualidade.png',
+        'img/icone-qualidade.svg',
+        'img/icone-reserva.svg',
+        'img/joao.jpg',
+        'img/logo.png',
+        'img/logos/873130898173009756220241028063922sst.png',
+        'img/logos/carnaval1.png',
+        'img/logos/logo09.png',
+        'img/logos/logo2.png',
+        'img/logos/logofff.png',
+        'img/logos/logox.webp',
+        'img/logos/pngtree-a-woman-using-digital-tablet-in-3d-illustration-on-transparent-background-png-image_12581961.png',
+        'img/online-shopping-text-banner-marketing-pop-art-banner-design-png.webp',
+        'img/shopping.png',
+        'img/shopping1.png',
+        'img/shopping3.png',
+        'img/time.png',
+        'img/timer.png',
+        'js/admin.js',
+        'js/app.js',
+        'js/bootstrap.min.js',
+        'js/dados.js',
+        'js/jquery-1.12.4.min.js',
+        'js/modal_cpanel.js',
+        'js/modernizr-3.5.0.min.js',
+        'js/overrides.js',
+        'js/popper.min.js',
+        'js/script.js',
+        'js/wow.min.js',
+        'src/assets/favicon.png',
+        'src/assets/icons/carrito.png',
+        'src/assets/icons/carrito1.png',
+        'src/assets/icons/favicon.png',
+        'src/assets/icons/tienda-online.png'
+    ];
+
+    // Archivos que necesitan patcheo antes de exportar
+    var PATCH_FILES = ['index.html', 'js/dados.js', 'js/app.js'];
+
+    // ------------------------------------------------------------
+    // ESTADO
+    // ------------------------------------------------------------
+    var state = {
+        menu: {},
+        categorias: {},
+        municipios: [],
+        telefono: DEFAULT_CELULAR,
+        telefonoDisplay: DEFAULT_CELULAR_DISPLAY
+    };
+
+    var currentCategoria = null; // filtro activo en la pestaña de productos
+    var editingProductId = null;
+    var editingCategoriaKey = null;
+    var editingMunicipioId = null;
+    var currentImageData = null; // data URL o URL para el producto en edición
+
+    // ------------------------------------------------------------
+    // UTILIDADES
+    // ------------------------------------------------------------
+    function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+    function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
+
+    function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+    function slugify(txt) {
+        return String(txt || '')
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '') || ('id-' + Date.now());
+    }
+
+    function escapeHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function toast(msg, type) {
+        var t = document.createElement('div');
+        t.className = 'toast' + (type ? ' ' + type : '');
+        var icon = type === 'error' ? 'fa-exclamation-circle'
+                 : type === 'warn'  ? 'fa-exclamation-triangle'
+                 : 'fa-check-circle';
+        t.innerHTML = '<i class="fas ' + icon + '"></i><span>' + escapeHtml(msg) + '</span>';
+        $('#toastContainer').appendChild(t);
+        setTimeout(function () { t.remove(); }, 3500);
+    }
+
+    // ------------------------------------------------------------
+    // PERSISTENCIA
+    // ------------------------------------------------------------
+    function loadState() {
+        // menu por defecto viene de dados.js (variable global MENU)
+        var defaultMenu = (typeof window.MENU !== 'undefined') ? window.MENU : {};
+
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                var saved = JSON.parse(raw);
+                state.menu        = saved.menu        ? deepClone(saved.menu)        : deepClone(defaultMenu);
+                state.categorias  = saved.categorias  ? deepClone(saved.categorias)  : deepClone(DEFAULT_CATEGORIAS);
+                state.municipios  = saved.municipios  ? deepClone(saved.municipios)  : deepClone(DEFAULT_MUNICIPIOS);
+                state.telefono    = saved.telefono    || DEFAULT_CELULAR;
+                state.telefonoDisplay = saved.telefonoDisplay || DEFAULT_CELULAR_DISPLAY;
+                return;
+            }
+        } catch (e) {
+            console.warn('[admin] Error leyendo storage:', e);
+        }
+        // Primera vez: cargar defaults
+        state.menu        = deepClone(defaultMenu);
+        state.categorias  = deepClone(DEFAULT_CATEGORIAS);
+        state.municipios  = deepClone(DEFAULT_MUNICIPIOS);
+        state.telefono    = DEFAULT_CELULAR;
+        state.telefonoDisplay = DEFAULT_CELULAR_DISPLAY;
+    }
+
+    function saveState() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+            toast('Error al guardar: ' + e.message, 'error');
+            console.error(e);
+            return false;
+        }
+        return true;
+    }
+
+    // ------------------------------------------------------------
+    // LOGIN
+    // ------------------------------------------------------------
+    function inicializarLogin() {
+        var form = $('#loginForm');
+        form.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            var u = $('#loginUser').value.trim();
+            var p = $('#loginPass').value;
+            if (u === CREDS.u && p === CREDS.p) {
+                sessionStorage.setItem(SESSION_KEY, '1');
+                abrirPanel();
+            } else {
+                var err = $('#loginError');
+                err.classList.add('show');
+                $('#loginPass').value = '';
+                setTimeout(function () { err.classList.remove('show'); }, 2500);
+            }
+        });
+
+        // Si ya había sesión abierta, entrar directo
+        if (sessionStorage.getItem(SESSION_KEY) === '1') {
+            abrirPanel();
+        }
+    }
+
+    function abrirPanel() {
+        $('#loginScreen').style.display = 'none';
+        $('#adminShell').classList.add('active');
+        loadState();
+        inicializarTabs();
+        renderTodo();
+    }
+
+    function cerrarSesion() {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
+    }
+
+    // ------------------------------------------------------------
+    // TABS
+    // ------------------------------------------------------------
+    function inicializarTabs() {
+        $$('.admin-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var tab = btn.getAttribute('data-tab');
+                $$('.admin-tab').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                $$('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+                $('#tab-' + tab).classList.add('active');
+            });
+        });
+
+        $('#btnLogout').addEventListener('click', cerrarSesion);
+    }
+
+    // ------------------------------------------------------------
+    // RENDER (global)
+    // ------------------------------------------------------------
+    function renderTodo() {
+        renderCategoryBar();
+        renderProductos();
+        renderCategorias();
+        renderMunicipios();
+        renderWhats();
+    }
+
+    // ------------------------------------------------------------
+    // TAB: PRODUCTOS
+    // ------------------------------------------------------------
+    function renderCategoryBar() {
+        var bar = $('#categoryBar');
+        bar.innerHTML = '';
+        var keys = Object.keys(state.categorias);
+
+        if (keys.length === 0) {
+            bar.innerHTML = '<span class="text-muted">No hay categorías. Crea una en la pestaña Categorías.</span>';
+            return;
+        }
+
+        // validar categoría actual
+        if (!currentCategoria || keys.indexOf(currentCategoria) === -1) {
+            currentCategoria = keys[0];
+        }
+
+        keys.forEach(function (key) {
+            var cat = state.categorias[key];
+            var count = (state.menu[key] || []).length;
+            var btn = document.createElement('button');
+            btn.className = 'category-chip' + (key === currentCategoria ? ' active' : '');
+            btn.innerHTML = '<i class="' + escapeHtml(cat.icone || 'fas fa-tag') + '"></i>'
+                         + '<span>' + escapeHtml(cat.nome || key) + '</span>'
+                         + '<span class="chip-count">' + count + '</span>';
+            btn.addEventListener('click', function () {
+                currentCategoria = key;
+                renderCategoryBar();
+                renderProductos();
+            });
+            bar.appendChild(btn);
+        });
+    }
+
+    function renderProductos() {
+        var wrap = $('#productsGridWrap');
+        if (!currentCategoria) {
+            wrap.innerHTML = '<div class="empty-state"><i class="fas fa-tag"></i><p>Crea una categoría primero.</p></div>';
+            return;
+        }
+
+        var items = state.menu[currentCategoria] || [];
+        if (items.length === 0) {
+            wrap.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No hay productos en esta categoría. Pulsa "Nuevo producto" para agregar uno.</p></div>';
+            return;
+        }
+
+        var grid = document.createElement('div');
+        grid.className = 'products-grid';
+
+        items.forEach(function (p, idx) {
+            var card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML =
+                '<img class="product-image" src="' + escapeHtml(p.img) + '" alt="' + escapeHtml(p.name) + '" onerror="this.style.display=\'none\'" />'
+              + '<div class="product-body">'
+              + '  <div class="product-name">' + escapeHtml(p.name) + '</div>'
+              + '  <div class="product-price">MN$ ' + Number(p.price || 0).toLocaleString('es-ES') + '</div>'
+              + '  <div class="product-id mono">' + escapeHtml(p.id) + '</div>'
+              + '</div>'
+              + '<div class="product-actions">'
+              + '  <button type="button" class="btn-secondary" data-edit="' + idx + '"><i class="fas fa-pen"></i> Editar</button>'
+              + '  <button type="button" class="btn-danger"    data-del="'  + idx + '"><i class="fas fa-trash"></i></button>'
+              + '</div>';
+            grid.appendChild(card);
+        });
+
+        wrap.innerHTML = '';
+        wrap.appendChild(grid);
+
+        // bindings
+        $$('[data-edit]', wrap).forEach(function (b) {
+            b.addEventListener('click', function () {
+                abrirModalProducto(parseInt(b.getAttribute('data-edit'), 10));
+            });
+        });
+        $$('[data-del]', wrap).forEach(function (b) {
+            b.addEventListener('click', function () {
+                eliminarProducto(parseInt(b.getAttribute('data-del'), 10));
+            });
+        });
+    }
+
+    function abrirModalProducto(idx) {
+        var esNuevo = (idx == null);
+        editingProductId = esNuevo ? null : idx;
+        currentImageData = null;
+
+        $('#modalProductoTitulo').textContent = esNuevo ? 'Nuevo producto' : 'Editar producto';
+
+        // llenar select de categorías
+        var sel = $('#prodCat');
+        sel.innerHTML = '';
+        Object.keys(state.categorias).forEach(function (k) {
+            var opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = state.categorias[k].nome + ' (' + k + ')';
+            sel.appendChild(opt);
+        });
+
+        if (esNuevo) {
+            $('#prodName').value = '';
+            $('#prodPrice').value = '';
+            $('#prodDsc').value = '';
+            $('#prodId').value = '';
+            $('#prodImgUrl').value = '';
+            sel.value = currentCategoria || Object.keys(state.categorias)[0];
+            renderProdImagePreview('');
+        } else {
+            var p = state.menu[currentCategoria][idx];
+            $('#prodName').value = p.name || '';
+            $('#prodPrice').value = p.price || 0;
+            $('#prodDsc').value = p.dsc || '';
+            $('#prodId').value = p.id || '';
+            $('#prodImgUrl').value = p.img || '';
+            sel.value = currentCategoria;
+            renderProdImagePreview(p.img || '');
+            currentImageData = p.img;
+        }
+
+        $('#modalProducto').classList.add('show');
+    }
+
+    function renderProdImagePreview(src) {
+        var prev = $('#prodImgPreview');
+        if (src) {
+            prev.innerHTML = '<img src="' + escapeHtml(src) + '" alt="" onerror="this.parentNode.innerHTML=\'<i class=fas fa-image style=font-size:32px></i>\'" />';
+        } else {
+            prev.innerHTML = '<i class="fas fa-image" style="font-size:32px;"></i>';
+        }
+    }
+
+    function guardarProducto() {
+        var nombre = $('#prodName').value.trim();
+        var precio = parseFloat($('#prodPrice').value);
+        var cat    = $('#prodCat').value;
+        var dsc    = $('#prodDsc').value.trim();
+        var idCust = $('#prodId').value.trim();
+        var imgUrl = ($('#prodImgUrl').value.trim()) || currentImageData || '';
+
+        if (!nombre) { toast('El nombre es obligatorio.', 'error'); return; }
+        if (isNaN(precio) || precio < 0) { toast('El precio debe ser un número válido.', 'error'); return; }
+        if (!cat) { toast('Selecciona una categoría.', 'error'); return; }
+
+        var id = idCust || slugify(nombre) + '-' + Math.random().toString(36).slice(2, 6);
+
+        var producto = {
+            id: id,
+            img: imgUrl || '',
+            name: nombre,
+            dsc: dsc || nombre,
+            price: precio
+        };
+
+        if (!state.menu[cat]) state.menu[cat] = [];
+
+        if (editingProductId == null) {
+            state.menu[cat].push(producto);
+        } else {
+            // si cambió de categoría, mover
+            var catOriginal = currentCategoria;
+            if (cat !== catOriginal) {
+                state.menu[catOriginal].splice(editingProductId, 1);
+                state.menu[cat].push(producto);
+            } else {
+                state.menu[catOriginal][editingProductId] = producto;
+            }
+        }
+
+        if (saveState()) {
+            toast(editingProductId == null ? 'Producto creado' : 'Producto actualizado');
+            cerrarModal('modalProducto');
+            renderCategoryBar();
+            renderProductos();
+        }
+    }
+
+    function eliminarProducto(idx) {
+        var items = state.menu[currentCategoria] || [];
+        var p = items[idx];
+        if (!p) return;
+        if (!confirm('¿Eliminar el producto "' + p.name + '"?')) return;
+        items.splice(idx, 1);
+        if (saveState()) {
+            toast('Producto eliminado');
+            renderCategoryBar();
+            renderProductos();
+        }
+    }
+
+    // ------------------------------------------------------------
+    // TAB: CATEGORÍAS
+    // ------------------------------------------------------------
+    function renderCategorias() {
+        var lista = $('#listaCategorias');
+        lista.innerHTML = '';
+        var keys = Object.keys(state.categorias);
+        if (keys.length === 0) {
+            lista.innerHTML = '<div class="empty-state"><i class="fas fa-th-large"></i><p>No hay categorías definidas.</p></div>';
+            return;
+        }
+        keys.forEach(function (key) {
+            var c = state.categorias[key];
+            var count = (state.menu[key] || []).length;
+            var row = document.createElement('div');
+            row.className = 'data-row';
+            row.innerHTML =
+                '<div class="data-row-icon"><i class="' + escapeHtml(c.icone || 'fas fa-tag') + '"></i></div>'
+              + '<div class="data-row-body">'
+              + '  <div class="data-row-title">' + escapeHtml(c.nome || key) + '</div>'
+              + '  <div class="data-row-sub mono">' + escapeHtml(key) + ' · ' + count + ' producto' + (count === 1 ? '' : 's') + '</div>'
+              + '</div>'
+              + '<div class="data-row-actions">'
+              + '  <button type="button" class="btn-secondary" data-edit-cat="' + escapeHtml(key) + '"><i class="fas fa-pen"></i></button>'
+              + '  <button type="button" class="btn-danger"    data-del-cat="'  + escapeHtml(key) + '"><i class="fas fa-trash"></i></button>'
+              + '</div>';
+            lista.appendChild(row);
+        });
+
+        $$('[data-edit-cat]', lista).forEach(function (b) {
+            b.addEventListener('click', function () { abrirModalCategoria(b.getAttribute('data-edit-cat')); });
+        });
+        $$('[data-del-cat]', lista).forEach(function (b) {
+            b.addEventListener('click', function () { eliminarCategoria(b.getAttribute('data-del-cat')); });
+        });
+    }
+
+    function abrirModalCategoria(key) {
+        editingCategoriaKey = key || null;
+        $('#modalCategoriaTitulo').textContent = key ? 'Editar categoría' : 'Nueva categoría';
+
+        var keyInput = $('#catKey');
+        if (key) {
+            keyInput.value = key;
+            keyInput.disabled = true;
+            $('#catNome').value = state.categorias[key].nome || '';
+            $('#catIcone').value = state.categorias[key].icone || 'fas fa-notes-medical';
+        } else {
+            keyInput.value = '';
+            keyInput.disabled = false;
+            $('#catNome').value = '';
+            $('#catIcone').value = 'fas fa-notes-medical';
+        }
+
+        $('#modalCategoria').classList.add('show');
+    }
+
+    function guardarCategoria() {
+        var keyNuevo = $('#catKey').value.trim();
+        var nome     = $('#catNome').value.trim();
+        var icone    = $('#catIcone').value.trim() || 'fas fa-notes-medical';
+
+        if (!keyNuevo) { toast('El ID interno es obligatorio.', 'error'); return; }
+        if (!nome) { toast('El nombre es obligatorio.', 'error'); return; }
+
+        var keyFinal = slugify(keyNuevo);
+
+        if (editingCategoriaKey) {
+            state.categorias[editingCategoriaKey] = { nome: nome, icone: icone };
+        } else {
+            if (state.categorias[keyFinal]) { toast('Ese ID ya existe.', 'error'); return; }
+            state.categorias[keyFinal] = { nome: nome, icone: icone };
+            if (!state.menu[keyFinal]) state.menu[keyFinal] = [];
+        }
+
+        if (saveState()) {
+            toast(editingCategoriaKey ? 'Categoría actualizada' : 'Categoría creada');
+            cerrarModal('modalCategoria');
+            renderCategorias();
+            renderCategoryBar();
+            renderProductos();
+        }
+    }
+
+    function eliminarCategoria(key) {
+        var count = (state.menu[key] || []).length;
+        var msg = count > 0
+            ? '¿Eliminar la categoría "' + (state.categorias[key].nome || key) + '"? Se eliminarán también sus ' + count + ' productos.'
+            : '¿Eliminar la categoría "' + (state.categorias[key].nome || key) + '"?';
+        if (!confirm(msg)) return;
+        delete state.categorias[key];
+        delete state.menu[key];
+        if (currentCategoria === key) currentCategoria = null;
+        if (saveState()) {
+            toast('Categoría eliminada');
+            renderCategorias();
+            renderCategoryBar();
+            renderProductos();
+        }
+    }
+
+    // ------------------------------------------------------------
+    // TAB: MUNICIPIOS
+    // ------------------------------------------------------------
+    function renderMunicipios() {
+        var lista = $('#listaMunicipiosAdmin');
+        lista.innerHTML = '';
+        if (!state.municipios.length) {
+            lista.innerHTML = '<div class="empty-state"><i class="fas fa-map-marked-alt"></i><p>No hay municipios. Agrega uno para habilitar la entrega a domicilio.</p></div>';
+            return;
+        }
+        state.municipios.forEach(function (m, idx) {
+            var row = document.createElement('div');
+            row.className = 'data-row';
+            row.innerHTML =
+                '<div class="data-row-icon"><i class="fas fa-map-marker-alt"></i></div>'
+              + '<div class="data-row-body">'
+              + '  <div class="data-row-title">' + escapeHtml(m.nome) + '</div>'
+              + '  <div class="data-row-sub">Envío: <b>MN$ ' + Number(m.costo).toLocaleString('es-ES') + '</b> · <span class="mono">' + escapeHtml(m.id) + '</span></div>'
+              + '</div>'
+              + '<div class="data-row-actions">'
+              + '  <button type="button" class="btn-secondary" data-edit-mun="' + idx + '"><i class="fas fa-pen"></i></button>'
+              + '  <button type="button" class="btn-danger"    data-del-mun="'  + idx + '"><i class="fas fa-trash"></i></button>'
+              + '</div>';
+            lista.appendChild(row);
+        });
+
+        $$('[data-edit-mun]', lista).forEach(function (b) {
+            b.addEventListener('click', function () { abrirModalMunicipio(parseInt(b.getAttribute('data-edit-mun'), 10)); });
+        });
+        $$('[data-del-mun]', lista).forEach(function (b) {
+            b.addEventListener('click', function () { eliminarMunicipio(parseInt(b.getAttribute('data-del-mun'), 10)); });
+        });
+    }
+
+    function abrirModalMunicipio(idx) {
+        editingMunicipioId = (idx == null) ? null : idx;
+        $('#modalMunicipioTitulo').textContent = (idx == null) ? 'Nuevo municipio' : 'Editar municipio';
+
+        if (idx == null) {
+            $('#muniNome').value = '';
+            $('#muniCosto').value = '';
+            $('#muniId').value = '';
+        } else {
+            var m = state.municipios[idx];
+            $('#muniNome').value = m.nome;
+            $('#muniCosto').value = m.costo;
+            $('#muniId').value = m.id;
+        }
+        $('#modalMunicipio').classList.add('show');
+    }
+
+    function guardarMunicipio() {
+        var nome = $('#muniNome').value.trim();
+        var costo = parseFloat($('#muniCosto').value);
+        var idCust = $('#muniId').value.trim();
+
+        if (!nome) { toast('El nombre es obligatorio.', 'error'); return; }
+        if (isNaN(costo) || costo < 0) { toast('El costo debe ser un número válido.', 'error'); return; }
+
+        var id = idCust || slugify(nome);
+
+        var municipio = { id: id, nome: nome, costo: costo };
+
+        if (editingMunicipioId == null) {
+            if (state.municipios.some(function (m) { return m.id === id; })) {
+                toast('Ya existe un municipio con ese ID.', 'error');
+                return;
+            }
+            state.municipios.push(municipio);
+        } else {
+            state.municipios[editingMunicipioId] = municipio;
+        }
+
+        if (saveState()) {
+            toast(editingMunicipioId == null ? 'Municipio creado' : 'Municipio actualizado');
+            cerrarModal('modalMunicipio');
+            renderMunicipios();
+        }
+    }
+
+    function eliminarMunicipio(idx) {
+        var m = state.municipios[idx];
+        if (!m) return;
+        if (!confirm('¿Eliminar el municipio "' + m.nome + '"?')) return;
+        state.municipios.splice(idx, 1);
+        if (saveState()) {
+            toast('Municipio eliminado');
+            renderMunicipios();
+        }
+    }
+
+    // ------------------------------------------------------------
+    // TAB: WHATSAPP
+    // ------------------------------------------------------------
+    function renderWhats() {
+        $('#inpTelefono').value = state.telefono;
+        $('#inpTelefonoDisplay').value = state.telefonoDisplay;
+        actualizarPreviewWhats();
+    }
+
+    function actualizarPreviewWhats() {
+        var tel = ($('#inpTelefono').value || '').replace(/\D/g, '');
+        $('#whatsPreview').innerHTML = tel
+            ? 'Enlace: <span class="mono">https://wa.me/' + tel + '</span>'
+            : '';
+    }
+
+    function guardarWhats() {
+        var tel = ($('#inpTelefono').value || '').replace(/\D/g, '');
+        var disp = ($('#inpTelefonoDisplay').value || '').trim();
+        if (!tel) { toast('El número es obligatorio.', 'error'); return; }
+        if (tel.length < 6) { toast('El número parece demasiado corto.', 'error'); return; }
+
+        state.telefono = tel;
+        state.telefonoDisplay = disp || tel;
+
+        if (saveState()) {
+            toast('Número de WhatsApp actualizado');
+        }
+    }
+
+    // ------------------------------------------------------------
+    // MODAL (helpers genéricos)
+    // ------------------------------------------------------------
+    function cerrarModal(id) {
+        $('#' + id).classList.remove('show');
+    }
+
+    function inicializarModales() {
+        // Cerrar con el botón X o Cancelar
+        $$('[data-close-modal]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                cerrarModal(btn.getAttribute('data-close-modal'));
+            });
+        });
+        // Cerrar al hacer clic fuera
+        $$('.modal-backdrop').forEach(function (mod) {
+            mod.addEventListener('click', function (ev) {
+                if (ev.target === mod) mod.classList.remove('show');
+            });
+        });
+        // ESC para cerrar
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') {
+                $$('.modal-backdrop.show').forEach(function (m) { m.classList.remove('show'); });
+            }
+        });
+    }
+
+    // ------------------------------------------------------------
+    // EVENTOS DE FORMULARIO (productos / categorías / municipios / whats)
+    // ------------------------------------------------------------
+    function inicializarFormularios() {
+        // Productos
+        $('#btnNuevoProducto').addEventListener('click', function () { abrirModalProducto(null); });
+        $('#btnGuardarProducto').addEventListener('click', guardarProducto);
+        $('#prodImgUrl').addEventListener('input', function () {
+            currentImageData = this.value.trim();
+            renderProdImagePreview(currentImageData);
+        });
+        $('#prodImgFile').addEventListener('change', function (ev) {
+            var f = ev.target.files && ev.target.files[0];
+            if (!f) return;
+            if (f.size > 3 * 1024 * 1024) {
+                toast('La imagen no debe superar 3 MB.', 'error');
+                ev.target.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                currentImageData = e.target.result;
+                $('#prodImgUrl').value = '';
+                renderProdImagePreview(currentImageData);
+                toast('Imagen cargada');
+            };
+            reader.readAsDataURL(f);
+        });
+
+        // Categorías
+        $('#btnNuevaCategoria').addEventListener('click', function () { abrirModalCategoria(null); });
+        $('#btnGuardarCategoria').addEventListener('click', guardarCategoria);
+
+        // Municipios
+        $('#btnNuevoMunicipio').addEventListener('click', function () { abrirModalMunicipio(null); });
+        $('#btnGuardarMunicipio').addEventListener('click', guardarMunicipio);
+
+        // WhatsApp
+        $('#inpTelefono').addEventListener('input', actualizarPreviewWhats);
+        $('#btnGuardarWhats').addEventListener('click', guardarWhats);
+
+        // Exportar
+        $('#btnExportar').addEventListener('click', exportarSitio);
+    }
+
+    // ------------------------------------------------------------
+    // EXPORTACIÓN (ZIP)
+    // ------------------------------------------------------------
+
+    /**
+     * Escapa strings para incluirlos en código JS fuente
+     */
+    function jsonForSource(obj) {
+        // JSON.stringify produce JSON válido que a la vez es JS válido
+        return JSON.stringify(obj, null, 4);
+    }
+
+    /**
+     * Aplica los cambios del panel a los archivos fuente
+     */
+    function patchearArchivo(path, texto) {
+        if (path === 'js/dados.js') {
+            // Reemplazar la declaración completa de MENU
+            // (dados.js en el proyecto sólo contiene la variable MENU)
+            return 'var MENU = ' + jsonForSource(state.menu) + ';\n';
+        }
+
+        if (path === 'js/app.js') {
+            var out = texto;
+
+            // 1) CELULAR_EMPRESA
+            out = out.replace(
+                /var\s+CELULAR_EMPRESA\s*=\s*'[^']*'\s*;/,
+                "var CELULAR_EMPRESA = '" + state.telefono + "';"
+            );
+
+            // 2) MUNICIPIOS_HABANA (array)
+            out = out.replace(
+                /var\s+MUNICIPIOS_HABANA\s*=\s*\[[\s\S]*?\];/,
+                'var MUNICIPIOS_HABANA = ' + jsonForSource(state.municipios) + ';'
+            );
+
+            // 3) CATEGORIAS (objeto)
+            out = out.replace(
+                /var\s+CATEGORIAS\s*=\s*\{[\s\S]*?\};/,
+                'var CATEGORIAS = ' + jsonForSource(state.categorias) + ';'
+            );
+
+            return out;
+        }
+
+        if (path === 'index.html') {
+            var outHtml = texto;
+
+            // Reemplazar número "completo" primero (más largo) y después el corto.
+            // Esto evita que el primer replace afecte al segundo.
+            outHtml = outHtml.split('5355135487').join(state.telefono);
+            outHtml = outHtml.split('55135487').join(state.telefono);
+            outHtml = outHtml.split('(53) 5513-5487').join(state.telefonoDisplay);
+
+            return outHtml;
+        }
+
+        return texto;
+    }
+
+    async function fetchArchivo(path) {
+        // Construir URL relativa al index actual, encodificando segmentos de ruta
+        var encoded = path.split('/').map(encodeURIComponent).join('/');
+        var r = await fetch(encoded, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' al obtener ' + path);
+        // Para archivos patcheables los leemos como texto
+        if (PATCH_FILES.indexOf(path) !== -1) return await r.text();
+        // Para binarios, blob
+        return await r.blob();
+    }
+
+    async function exportarSitio() {
+        var btn = $('#btnExportar');
+        var prog = $('#exportProgress');
+        btn.disabled = true;
+
+        try {
+            if (typeof JSZip === 'undefined') {
+                throw new Error('JSZip no cargó. Revisa tu conexión a internet.');
+            }
+
+            var zip = new JSZip();
+            var total = FILE_MANIFEST.length;
+            var ok = 0, fail = 0;
+
+            for (var i = 0; i < total; i++) {
+                var path = FILE_MANIFEST[i];
+                prog.textContent = 'Procesando ' + (i + 1) + '/' + total + ' · ' + path;
+
+                try {
+                    var data = await fetchArchivo(path);
+                    if (PATCH_FILES.indexOf(path) !== -1) {
+                        data = patchearArchivo(path, data);
+                        zip.file(path, data);
+                    } else {
+                        zip.file(path, data);
+                    }
+                    ok++;
+                } catch (err) {
+                    console.warn('[export] No se pudo incluir', path, err);
+                    fail++;
+                }
+            }
+
+            // Incluir un pequeño archivo de configuración de respaldo (por si se
+            // quiere volver a cargar en otro dispositivo / navegador)
+            zip.file('admin-config.backup.json', JSON.stringify(state, null, 2));
+
+            prog.textContent = 'Generando ZIP...';
+            var blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+
+            // Descargar
+            var a = document.createElement('a');
+            var d = new Date();
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            var stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes());
+            a.href = URL.createObjectURL(blob);
+            a.download = 'cabreras-shop-export-' + stamp + '.zip';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }, 1000);
+
+            prog.innerHTML = '<span style="color: var(--admin-primary)"><i class="fas fa-check-circle"></i> Exportación completa: ' + ok + ' archivos'
+                + (fail ? ' · <span style="color: var(--admin-accent)">' + fail + ' no encontrados (omitidos)</span>' : '') + '</span>';
+            toast('Paquete generado correctamente', 'success');
+
+        } catch (err) {
+            console.error('[export]', err);
+            prog.innerHTML = '<span style="color: var(--admin-danger)"><i class="fas fa-exclamation-circle"></i> ' + escapeHtml(err.message) + '</span>';
+            toast('Error al exportar: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    // ------------------------------------------------------------
+    // ARRANQUE
+    // ------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', function () {
+        inicializarLogin();
+        inicializarModales();
+        inicializarFormularios();
+    });
+
+})();
