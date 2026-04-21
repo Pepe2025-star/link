@@ -2452,3 +2452,111 @@ body.modal-abierto {
     font-size: 15px;
     flex-shrink: 0;
 }
+
+/* ============================================= */
+/* Secciones de formulario DENTRO del modal      */
+/* (Datos de contacto + Método de pago)          */
+/* ============================================= */
+.modal-direccion-body .modal-form-section {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--color-separate);
+}
+
+.modal-direccion-body .modal-form-section:first-of-type {
+    margin-top: 18px;
+}
+
+.modal-direccion-body .modal-form-section .form-section-title {
+    margin-bottom: 10px;
+}
+
+.modal-direccion-body .modal-form-section .metodo-pago-group {
+    margin-top: 8px;
+}
+
+/* ============================================= */
+/* Caja de número de orden en el resumen         */
+/* ============================================= */
+.resumo-orden-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #0a7d2c 100%);
+    color: var(--color-white);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 8px 0 22px 0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.resumo-orden-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.resumo-orden-icon i {
+    color: var(--color-white);
+    font-size: 20px;
+}
+
+.resumo-orden-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.resumo-orden-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.resumo-orden-valor {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    word-break: break-all;
+}
+
+/* Responsive: móviles */
+@media (max-width: 575px) {
+    .resumo-orden-box {
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .resumo-orden-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .resumo-orden-icon i {
+        font-size: 17px;
+    }
+
+    .resumo-orden-valor {
+        font-size: 15px;
+    }
+
+    .resumo-orden-label {
+        font-size: 11px;
+    }
+}
+
+/* Responsive: tablets */
+@media (min-width: 576px) and (max-width: 991px) {
+    .resumo-orden-valor {
+        font-size: 17px;
+    }
+}
