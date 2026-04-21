@@ -1,14 +1,14 @@
 /*
  * overrides.js
  * ----------------------------------------------------------------
- * Este archivo lee la configuración guardada por el panel de control
+ * Lee la configuración guardada por el panel de control
  * (localStorage: "cshop_admin_config_v1") y la aplica en tiempo real
  * sobre las variables globales del sitio (MENU, CATEGORIAS,
- * MUNICIPIOS_HABANA, CELULAR_EMPRESA).
+ * MUNICIPIOS_HABANA, CELULAR_EMPRESA) y sobre el DOM (teléfonos,
+ * logotipo y fondo de página).
  *
  * Debe cargarse DESPUÉS de js/dados.js y js/app.js, pero ANTES de que
- * se ejecute $(document).ready(...) (lo cual funciona naturalmente
- * porque el orden de <script> en el HTML respeta la secuencia).
+ * se ejecute $(document).ready(...).
  * ----------------------------------------------------------------
  */
 (function () {
@@ -32,7 +32,6 @@
 
         // MENU (productos por categoría)
         if (cfg.menu && typeof cfg.menu === 'object' && typeof window.MENU !== 'undefined') {
-            // Reemplazar el contenido del MENU, preservando la referencia
             Object.keys(window.MENU).forEach(function (k) { delete window.MENU[k]; });
             Object.keys(cfg.menu).forEach(function (k) {
                 window.MENU[k] = cfg.menu[k];
@@ -62,55 +61,106 @@
     }
 
     /**
+     * Inyecta o actualiza un <style id="cpanel-theme"> con las reglas
+     * de fondo de página/color de respaldo. Se crea antes de que el CSS
+     * principal tome efecto para evitar un flash.
+     */
+    function aplicarTema(cfg) {
+        if (!cfg) return;
+        var css = '';
+
+        if (cfg.pageBgColor) {
+            css += ':root{--color-background:' + cfg.pageBgColor + ';}\n';
+            css += 'body{background-color:' + cfg.pageBgColor + ';}\n';
+        }
+
+        if (cfg.pageBgImage) {
+            // Imagen de fondo fija que cubre toda la ventana
+            css += 'body{'
+                 + 'background-image:url("' + cfg.pageBgImage + '");'
+                 + 'background-size:cover;'
+                 + 'background-position:center center;'
+                 + 'background-attachment:fixed;'
+                 + 'background-repeat:no-repeat;'
+                 + '}\n';
+        }
+
+        if (!css) {
+            var existing = document.getElementById('cpanel-theme');
+            if (existing) existing.remove();
+            return;
+        }
+
+        var tag = document.getElementById('cpanel-theme');
+        if (!tag) {
+            tag = document.createElement('style');
+            tag.id = 'cpanel-theme';
+            (document.head || document.documentElement).appendChild(tag);
+        }
+        tag.textContent = css;
+    }
+
+    /**
+     * Reemplaza los logotipos (header y footer) por la imagen configurada.
+     */
+    function aplicarLogo(cfg) {
+        if (!cfg || !cfg.logoUrl) return;
+
+        // Logo principal y del footer
+        var nodos = document.querySelectorAll('.img-logo, .logo-footer, img[src$="logo.png"], img[src*="/logo.png"]');
+        nodos.forEach(function (img) {
+            img.setAttribute('src', cfg.logoUrl);
+        });
+
+        // Favicon
+        var favicon = document.querySelector('link[rel="shortcut icon"], link[rel="icon"]');
+        if (favicon && cfg.faviconUrl) {
+            favicon.setAttribute('href', cfg.faviconUrl);
+        }
+    }
+
+    /**
      * Ajusta el DOM (enlaces/textos con números de teléfono hardcodeados
      * en index.html) para que reflejen el número configurado.
      */
     function patchearDOM(cfg) {
         if (!cfg) return;
 
+        aplicarLogo(cfg);
+
         var tel = (cfg.telefono || '').replace(/\D/g, '');
         var telDisplay = cfg.telefonoDisplay || null;
 
         if (!tel) return;
 
-        // Enlace "tel:" del botón "Llamar" del menú flotante + botón banner
         document.querySelectorAll('a[href^="tel:"]').forEach(function (a) {
             a.setAttribute('href', 'tel:+' + tel);
         });
 
-        // Enlaces de WhatsApp (api.whatsapp.com o wa.me)
         document.querySelectorAll('a[href*="whatsapp.com"], a[href*="wa.me"]').forEach(function (a) {
             var href = a.getAttribute('href') || '';
-            // Reemplazar el número sin tocar el resto del query
             href = href.replace(/phone=\d+/g, 'phone=' + tel);
             href = href.replace(/wa\.me\/\d+/g, 'wa.me/' + tel);
             a.setAttribute('href', href);
         });
 
-        // Botón del banner principal con el teléfono visible
         var btnLigar = document.getElementById('btnLigar');
         if (btnLigar && telDisplay) {
-            // Conservar el ícono, reemplazar solo el texto visible del número
-            var span = btnLigar.querySelector('.icon-left');
-            if (span) {
-                // el texto a la derecha del span
-                var textoNuevo = ' ' + telDisplay;
-                // limpiar nodos de texto existentes
-                Array.from(btnLigar.childNodes).forEach(function (n) {
-                    if (n.nodeType === Node.TEXT_NODE) n.textContent = '';
-                });
-                btnLigar.appendChild(document.createTextNode(textoNuevo));
-            } else {
-                btnLigar.textContent = telDisplay;
-            }
+            Array.from(btnLigar.childNodes).forEach(function (n) {
+                if (n.nodeType === Node.TEXT_NODE) n.textContent = '';
+            });
+            btnLigar.appendChild(document.createTextNode(' ' + telDisplay));
         }
     }
 
     // ---------- APLICAR EN EL ARRANQUE ----------
     var cfg = leerConfig();
+
+    // El tema debe aplicarse AHORA (antes de que pinte el body) para
+    // evitar flash del color por defecto.
+    aplicarTema(cfg);
     aplicarConfig(cfg);
 
-    // Patchear el DOM cuando esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () { patchearDOM(cfg); });
     } else {
@@ -120,12 +170,9 @@
     // ---------- TIEMPO REAL: recargar si cambia la config en otra pestaña ----------
     window.addEventListener('storage', function (ev) {
         if (ev.key === STORAGE_KEY) {
-            // La forma más segura de re-aplicar todo (re-renderizar categorías,
-            // municipios, contadores, etc.) es recargar la página.
             location.reload();
         }
     });
 
-    // Señal global para indicar que los overrides se aplicaron
     window.__CSHOP_OVERRIDES_APPLIED__ = !!cfg;
 })();

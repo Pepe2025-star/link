@@ -22,6 +22,10 @@
     -webkit-animation-delay: 0.8s;
             animation-delay: 0.8s;
   }
+  .list-container.active .more-button-list-item:nth-child(5) {
+    -webkit-animation-delay: 1s;
+            animation-delay: 1s;
+  }
   .list-container.active .more-button {
     -webkit-animation: onePulse 0.6s forwards linear;
             animation: onePulse 0.6s forwards linear;

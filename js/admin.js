@@ -10,7 +10,7 @@
     var STORAGE_KEY = 'cshop_admin_config_v1';
     var SESSION_KEY = 'cshop_admin_session_v1';
 
-    // Credenciales (requeridas por el proyecto). Cualquier intento debe coincidir EXACTAMENTE.
+    // Credenciales (requeridas por el proyecto). Deben coincidir EXACTAMENTE.
     var CREDS = { u: 'root', p: 'habanaya2029' };
 
     // ------------------------------------------------------------
@@ -46,6 +46,8 @@
 
     var DEFAULT_CELULAR = '5355135487';
     var DEFAULT_CELULAR_DISPLAY = '(53) 5513-5487';
+    var DEFAULT_PAGE_BG_COLOR = '#fffdf7';
+    var DEFAULT_ADMIN_BG_COLOR = '#0f172a';
 
     // ------------------------------------------------------------
     // MANIFIESTO DE ARCHIVOS DEL SITIO (para exportar)
@@ -208,14 +210,22 @@
         categorias: {},
         municipios: [],
         telefono: DEFAULT_CELULAR,
-        telefonoDisplay: DEFAULT_CELULAR_DISPLAY
+        telefonoDisplay: DEFAULT_CELULAR_DISPLAY,
+        // apariencia
+        logoUrl: '',                 // data URL o ruta con el nuevo logo (vacío = usar el original)
+        pageBgColor: DEFAULT_PAGE_BG_COLOR,
+        pageBgImage: '',             // data URL con la imagen de fondo (vacío = sin imagen)
+        adminBgColor: DEFAULT_ADMIN_BG_COLOR
     };
 
-    var currentCategoria = null; // filtro activo en la pestaña de productos
+    var currentCategoria = null;
     var editingProductId = null;
     var editingCategoriaKey = null;
     var editingMunicipioId = null;
-    var currentImageData = null; // data URL o URL para el producto en edición
+    var currentImageData = null;
+
+    // buffers temporales de apariencia (sin guardar hasta pulsar "Guardar")
+    var draftApariencia = null;
 
     // ------------------------------------------------------------
     // UTILIDADES
@@ -253,33 +263,66 @@
         setTimeout(function () { t.remove(); }, 3500);
     }
 
+    // Extrae la extensión (png/jpg/webp) de un data URL
+    function extFromDataUrl(d) {
+        var m = /^data:image\/([a-zA-Z0-9+.-]+);/.exec(d || '');
+        if (!m) return 'png';
+        var e = m[1].toLowerCase();
+        if (e === 'jpeg') return 'jpg';
+        if (e === 'svg+xml') return 'svg';
+        return e;
+    }
+    // Extrae la parte base64 de un data URL
+    function base64FromDataUrl(d) {
+        var i = (d || '').indexOf(',');
+        return i >= 0 ? d.slice(i + 1) : '';
+    }
+    function isDataUrl(s) { return typeof s === 'string' && s.indexOf('data:') === 0; }
+
+    function validarHex(v) {
+        return /^#?[0-9a-fA-F]{6}$/.test(v || '');
+    }
+    function normalizarHex(v) {
+        v = (v || '').trim();
+        if (!v) return '';
+        if (v.charAt(0) !== '#') v = '#' + v;
+        return v.toLowerCase();
+    }
+
     // ------------------------------------------------------------
     // PERSISTENCIA
     // ------------------------------------------------------------
     function loadState() {
-        // menu por defecto viene de dados.js (variable global MENU)
         var defaultMenu = (typeof window.MENU !== 'undefined') ? window.MENU : {};
 
         try {
             var raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 var saved = JSON.parse(raw);
-                state.menu        = saved.menu        ? deepClone(saved.menu)        : deepClone(defaultMenu);
-                state.categorias  = saved.categorias  ? deepClone(saved.categorias)  : deepClone(DEFAULT_CATEGORIAS);
-                state.municipios  = saved.municipios  ? deepClone(saved.municipios)  : deepClone(DEFAULT_MUNICIPIOS);
-                state.telefono    = saved.telefono    || DEFAULT_CELULAR;
+                state.menu            = saved.menu            ? deepClone(saved.menu)            : deepClone(defaultMenu);
+                state.categorias      = saved.categorias      ? deepClone(saved.categorias)      : deepClone(DEFAULT_CATEGORIAS);
+                state.municipios      = saved.municipios      ? deepClone(saved.municipios)      : deepClone(DEFAULT_MUNICIPIOS);
+                state.telefono        = saved.telefono        || DEFAULT_CELULAR;
                 state.telefonoDisplay = saved.telefonoDisplay || DEFAULT_CELULAR_DISPLAY;
+                state.logoUrl         = saved.logoUrl         || '';
+                state.pageBgColor     = saved.pageBgColor     || DEFAULT_PAGE_BG_COLOR;
+                state.pageBgImage     = saved.pageBgImage     || '';
+                state.adminBgColor    = saved.adminBgColor    || DEFAULT_ADMIN_BG_COLOR;
                 return;
             }
         } catch (e) {
             console.warn('[admin] Error leyendo storage:', e);
         }
-        // Primera vez: cargar defaults
-        state.menu        = deepClone(defaultMenu);
-        state.categorias  = deepClone(DEFAULT_CATEGORIAS);
-        state.municipios  = deepClone(DEFAULT_MUNICIPIOS);
-        state.telefono    = DEFAULT_CELULAR;
+        // Primera vez
+        state.menu            = deepClone(defaultMenu);
+        state.categorias      = deepClone(DEFAULT_CATEGORIAS);
+        state.municipios      = deepClone(DEFAULT_MUNICIPIOS);
+        state.telefono        = DEFAULT_CELULAR;
         state.telefonoDisplay = DEFAULT_CELULAR_DISPLAY;
+        state.logoUrl         = '';
+        state.pageBgColor     = DEFAULT_PAGE_BG_COLOR;
+        state.pageBgImage     = '';
+        state.adminBgColor    = DEFAULT_ADMIN_BG_COLOR;
     }
 
     function saveState() {
@@ -313,7 +356,6 @@
             }
         });
 
-        // Si ya había sesión abierta, entrar directo
         if (sessionStorage.getItem(SESSION_KEY) === '1') {
             abrirPanel();
         }
@@ -323,6 +365,7 @@
         $('#loginScreen').style.display = 'none';
         $('#adminShell').classList.add('active');
         loadState();
+        aplicarAdminBg(state.adminBgColor);
         inicializarTabs();
         renderTodo();
     }
@@ -349,15 +392,13 @@
         $('#btnLogout').addEventListener('click', cerrarSesion);
     }
 
-    // ------------------------------------------------------------
-    // RENDER (global)
-    // ------------------------------------------------------------
     function renderTodo() {
         renderCategoryBar();
         renderProductos();
         renderCategorias();
         renderMunicipios();
         renderWhats();
+        renderApariencia();
     }
 
     // ------------------------------------------------------------
@@ -373,7 +414,6 @@
             return;
         }
 
-        // validar categoría actual
         if (!currentCategoria || keys.indexOf(currentCategoria) === -1) {
             currentCategoria = keys[0];
         }
@@ -431,7 +471,6 @@
         wrap.innerHTML = '';
         wrap.appendChild(grid);
 
-        // bindings
         $$('[data-edit]', wrap).forEach(function (b) {
             b.addEventListener('click', function () {
                 abrirModalProducto(parseInt(b.getAttribute('data-edit'), 10));
@@ -451,7 +490,6 @@
 
         $('#modalProductoTitulo').textContent = esNuevo ? 'Nuevo producto' : 'Editar producto';
 
-        // llenar select de categorías
         var sel = $('#prodCat');
         sel.innerHTML = '';
         Object.keys(state.categorias).forEach(function (k) {
@@ -520,7 +558,6 @@
         if (editingProductId == null) {
             state.menu[cat].push(producto);
         } else {
-            // si cambió de categoría, mover
             var catOriginal = currentCategoria;
             if (cat !== catOriginal) {
                 state.menu[catOriginal].splice(editingProductId, 1);
@@ -774,26 +811,113 @@
     }
 
     // ------------------------------------------------------------
-    // MODAL (helpers genéricos)
+    // TAB: APARIENCIA
+    // ------------------------------------------------------------
+    function aplicarAdminBg(color) {
+        // cambia el color de fondo del panel en vivo
+        document.documentElement.style.setProperty('--admin-bg', color || DEFAULT_ADMIN_BG_COLOR);
+    }
+
+    function renderLogoPreview(src) {
+        var box = $('#logoPreview');
+        if (src) {
+            box.innerHTML = '<img src="' + escapeHtml(src) + '" alt="Logo" onerror="this.parentNode.innerHTML=\'<div class=placeholder><i class=\\\'fas fa-exclamation-triangle\\\'></i><span>No se pudo cargar la imagen</span></div>\'" />';
+        } else {
+            box.innerHTML = '<div class="placeholder"><i class="fas fa-image"></i><span>Sin logo personalizado (se usa el original)</span></div>';
+        }
+    }
+
+    function renderPageBgPreview() {
+        var box = $('#pageBgPreview');
+        if (!box) return;
+        box.style.backgroundColor = draftApariencia.pageBgColor || DEFAULT_PAGE_BG_COLOR;
+        if (draftApariencia.pageBgImage) {
+            box.style.backgroundImage = 'url("' + draftApariencia.pageBgImage + '")';
+        } else {
+            box.style.backgroundImage = 'none';
+        }
+    }
+
+    function renderApariencia() {
+        // Iniciamos un draft a partir del state actual
+        draftApariencia = {
+            logoUrl: state.logoUrl || '',
+            pageBgColor: state.pageBgColor || DEFAULT_PAGE_BG_COLOR,
+            pageBgImage: state.pageBgImage || '',
+            adminBgColor: state.adminBgColor || DEFAULT_ADMIN_BG_COLOR
+        };
+
+        // Logo
+        renderLogoPreview(draftApariencia.logoUrl);
+        $('#logoUrl').value = draftApariencia.logoUrl && !isDataUrl(draftApariencia.logoUrl) ? draftApariencia.logoUrl : '';
+
+        // Fondo página
+        $('#pageBgColor').value    = draftApariencia.pageBgColor;
+        $('#pageBgColorHex').value = draftApariencia.pageBgColor;
+        renderPageBgPreview();
+
+        // Color panel
+        $('#adminBgColor').value    = draftApariencia.adminBgColor;
+        $('#adminBgColorHex').value = draftApariencia.adminBgColor;
+        marcarPresetActivo(draftApariencia.adminBgColor);
+    }
+
+    function marcarPresetActivo(color) {
+        $$('#panelPresets .panel-preset').forEach(function (b) {
+            b.classList.toggle('active', (b.getAttribute('data-color') || '').toLowerCase() === (color || '').toLowerCase());
+        });
+    }
+
+    function guardarApariencia() {
+        // Validar color de página
+        var pc = normalizarHex($('#pageBgColorHex').value) || draftApariencia.pageBgColor;
+        if (!validarHex(pc)) { toast('Color de fondo inválido. Usa formato #RRGGBB.', 'error'); return; }
+
+        var ac = normalizarHex($('#adminBgColorHex').value) || draftApariencia.adminBgColor;
+        if (!validarHex(ac)) { toast('Color del panel inválido. Usa formato #RRGGBB.', 'error'); return; }
+
+        state.logoUrl      = draftApariencia.logoUrl;
+        state.pageBgColor  = pc;
+        state.pageBgImage  = draftApariencia.pageBgImage;
+        state.adminBgColor = ac;
+
+        if (saveState()) {
+            aplicarAdminBg(state.adminBgColor);
+            toast('Apariencia actualizada. Los cambios ya se ven en la tienda.');
+        }
+    }
+
+    function restablecerApariencia() {
+        if (!confirm('¿Restablecer logo, fondo de página y color del panel a sus valores originales?')) return;
+        state.logoUrl      = '';
+        state.pageBgColor  = DEFAULT_PAGE_BG_COLOR;
+        state.pageBgImage  = '';
+        state.adminBgColor = DEFAULT_ADMIN_BG_COLOR;
+        if (saveState()) {
+            aplicarAdminBg(state.adminBgColor);
+            renderApariencia();
+            toast('Apariencia restablecida');
+        }
+    }
+
+    // ------------------------------------------------------------
+    // MODAL helpers
     // ------------------------------------------------------------
     function cerrarModal(id) {
         $('#' + id).classList.remove('show');
     }
 
     function inicializarModales() {
-        // Cerrar con el botón X o Cancelar
         $$('[data-close-modal]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 cerrarModal(btn.getAttribute('data-close-modal'));
             });
         });
-        // Cerrar al hacer clic fuera
         $$('.modal-backdrop').forEach(function (mod) {
             mod.addEventListener('click', function (ev) {
                 if (ev.target === mod) mod.classList.remove('show');
             });
         });
-        // ESC para cerrar
         document.addEventListener('keydown', function (ev) {
             if (ev.key === 'Escape') {
                 $$('.modal-backdrop.show').forEach(function (m) { m.classList.remove('show'); });
@@ -802,7 +926,7 @@
     }
 
     // ------------------------------------------------------------
-    // EVENTOS DE FORMULARIO (productos / categorías / municipios / whats)
+    // EVENTOS DE FORMULARIO
     // ------------------------------------------------------------
     function inicializarFormularios() {
         // Productos
@@ -842,64 +966,187 @@
         $('#inpTelefono').addEventListener('input', actualizarPreviewWhats);
         $('#btnGuardarWhats').addEventListener('click', guardarWhats);
 
+        // Apariencia - logo
+        $('#logoFile').addEventListener('change', function (ev) {
+            var f = ev.target.files && ev.target.files[0];
+            if (!f) return;
+            if (f.size > 3 * 1024 * 1024) {
+                toast('La imagen no debe superar 3 MB.', 'error');
+                ev.target.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                draftApariencia.logoUrl = e.target.result;
+                $('#logoUrl').value = '';
+                renderLogoPreview(draftApariencia.logoUrl);
+                toast('Logo cargado. Pulsa "Guardar cambios" para aplicar.');
+            };
+            reader.readAsDataURL(f);
+        });
+        $('#logoUrl').addEventListener('input', function () {
+            var v = this.value.trim();
+            draftApariencia.logoUrl = v;
+            renderLogoPreview(v);
+        });
+        $('#btnQuitarLogo').addEventListener('click', function () {
+            draftApariencia.logoUrl = '';
+            $('#logoUrl').value = '';
+            $('#logoFile').value = '';
+            renderLogoPreview('');
+        });
+
+        // Apariencia - fondo de página
+        $('#pageBgColor').addEventListener('input', function () {
+            draftApariencia.pageBgColor = this.value;
+            $('#pageBgColorHex').value = this.value;
+            renderPageBgPreview();
+        });
+        $('#pageBgColorHex').addEventListener('input', function () {
+            var v = normalizarHex(this.value);
+            if (validarHex(v)) {
+                draftApariencia.pageBgColor = v;
+                $('#pageBgColor').value = v;
+                renderPageBgPreview();
+            }
+        });
+        $('#pageBgFile').addEventListener('change', function (ev) {
+            var f = ev.target.files && ev.target.files[0];
+            if (!f) return;
+            if (f.size > 4 * 1024 * 1024) {
+                toast('La imagen de fondo no debe superar 4 MB.', 'error');
+                ev.target.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                draftApariencia.pageBgImage = e.target.result;
+                renderPageBgPreview();
+                toast('Imagen de fondo cargada. Pulsa "Guardar cambios" para aplicar.');
+            };
+            reader.readAsDataURL(f);
+        });
+        $('#btnQuitarBg').addEventListener('click', function () {
+            draftApariencia.pageBgImage = '';
+            $('#pageBgFile').value = '';
+            renderPageBgPreview();
+        });
+
+        // Apariencia - color del panel (con preview en vivo)
+        $('#adminBgColor').addEventListener('input', function () {
+            draftApariencia.adminBgColor = this.value;
+            $('#adminBgColorHex').value = this.value;
+            aplicarAdminBg(this.value);  // preview inmediato
+            marcarPresetActivo(this.value);
+        });
+        $('#adminBgColorHex').addEventListener('input', function () {
+            var v = normalizarHex(this.value);
+            if (validarHex(v)) {
+                draftApariencia.adminBgColor = v;
+                $('#adminBgColor').value = v;
+                aplicarAdminBg(v);
+                marcarPresetActivo(v);
+            }
+        });
+        $$('#panelPresets .panel-preset').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var c = btn.getAttribute('data-color');
+                draftApariencia.adminBgColor = c;
+                $('#adminBgColor').value = c;
+                $('#adminBgColorHex').value = c;
+                aplicarAdminBg(c);
+                marcarPresetActivo(c);
+            });
+        });
+
+        // Botones principales de apariencia
+        $('#btnGuardarApariencia').addEventListener('click', guardarApariencia);
+        $('#btnRestablecerApariencia').addEventListener('click', restablecerApariencia);
+
         // Exportar
         $('#btnExportar').addEventListener('click', exportarSitio);
     }
 
     // ------------------------------------------------------------
-    // EXPORTACIÓN (ZIP)
+    // EXPORTACIÓN (ZIP completo del código fuente con los cambios)
     // ------------------------------------------------------------
-
-    /**
-     * Escapa strings para incluirlos en código JS fuente
-     */
     function jsonForSource(obj) {
-        // JSON.stringify produce JSON válido que a la vez es JS válido
         return JSON.stringify(obj, null, 4);
     }
 
     /**
-     * Aplica los cambios del panel a los archivos fuente
+     * Genera el bloque CSS que se inyecta en <head> de index.html
+     * con las reglas de fondo de página.
      */
-    function patchearArchivo(path, texto) {
+    function generarCssTema(pageBgImgPath) {
+        var lines = [];
+        if (state.pageBgColor && state.pageBgColor.toLowerCase() !== DEFAULT_PAGE_BG_COLOR.toLowerCase()) {
+            lines.push(':root { --color-background: ' + state.pageBgColor + '; }');
+            lines.push('body { background-color: ' + state.pageBgColor + '; }');
+        }
+        if (pageBgImgPath) {
+            lines.push('body {');
+            lines.push('  background-image: url("' + pageBgImgPath + '");');
+            lines.push('  background-size: cover;');
+            lines.push('  background-position: center center;');
+            lines.push('  background-attachment: fixed;');
+            lines.push('  background-repeat: no-repeat;');
+            lines.push('}');
+        }
+        return lines.join('\n');
+    }
+
+    /**
+     * Aplica los cambios del panel a los archivos fuente antes de meterlos en el ZIP.
+     */
+    function patchearArchivo(path, texto, pageBgImgPath) {
         if (path === 'js/dados.js') {
-            // Reemplazar la declaración completa de MENU
-            // (dados.js en el proyecto sólo contiene la variable MENU)
             return 'var MENU = ' + jsonForSource(state.menu) + ';\n';
         }
 
         if (path === 'js/app.js') {
             var out = texto;
-
-            // 1) CELULAR_EMPRESA
             out = out.replace(
                 /var\s+CELULAR_EMPRESA\s*=\s*'[^']*'\s*;/,
                 "var CELULAR_EMPRESA = '" + state.telefono + "';"
             );
-
-            // 2) MUNICIPIOS_HABANA (array)
             out = out.replace(
                 /var\s+MUNICIPIOS_HABANA\s*=\s*\[[\s\S]*?\];/,
                 'var MUNICIPIOS_HABANA = ' + jsonForSource(state.municipios) + ';'
             );
-
-            // 3) CATEGORIAS (objeto)
             out = out.replace(
                 /var\s+CATEGORIAS\s*=\s*\{[\s\S]*?\};/,
                 'var CATEGORIAS = ' + jsonForSource(state.categorias) + ';'
             );
-
             return out;
         }
 
         if (path === 'index.html') {
             var outHtml = texto;
 
-            // Reemplazar número "completo" primero (más largo) y después el corto.
-            // Esto evita que el primer replace afecte al segundo.
+            // 1) Teléfonos / WhatsApp
             outHtml = outHtml.split('5355135487').join(state.telefono);
             outHtml = outHtml.split('55135487').join(state.telefono);
             outHtml = outHtml.split('(53) 5513-5487').join(state.telefonoDisplay);
+
+            // 2) Logo: si viene de URL externa, cambiar el src directamente.
+            //    Si es data URL, conservamos "./img/logo.png" porque vamos a
+            //    sobreescribir el archivo en el ZIP con los bytes nuevos.
+            if (state.logoUrl && !isDataUrl(state.logoUrl)) {
+                outHtml = outHtml.split('./img/logo.png').join(state.logoUrl);
+                outHtml = outHtml.split('img/logo.png').join(state.logoUrl);
+            }
+
+            // 3) Inyectar bloque <style id="cpanel-theme"> con los colores/fondo
+            var cssTema = generarCssTema(pageBgImgPath);
+            if (cssTema) {
+                var bloque = '\n<style id="cpanel-theme">\n' + cssTema + '\n</style>\n';
+                if (outHtml.indexOf('</head>') !== -1) {
+                    outHtml = outHtml.replace('</head>', bloque + '</head>');
+                } else {
+                    outHtml = bloque + outHtml;
+                }
+            }
 
             return outHtml;
         }
@@ -908,13 +1155,10 @@
     }
 
     async function fetchArchivo(path) {
-        // Construir URL relativa al index actual, encodificando segmentos de ruta
         var encoded = path.split('/').map(encodeURIComponent).join('/');
         var r = await fetch(encoded, { cache: 'no-store' });
         if (!r.ok) throw new Error('HTTP ' + r.status + ' al obtener ' + path);
-        // Para archivos patcheables los leemos como texto
         if (PATCH_FILES.indexOf(path) !== -1) return await r.text();
-        // Para binarios, blob
         return await r.blob();
     }
 
@@ -932,14 +1176,33 @@
             var total = FILE_MANIFEST.length;
             var ok = 0, fail = 0;
 
+            // ---- 1) Preparar el archivo de fondo (si es data URL) ----
+            var pageBgImgPath = '';
+            if (state.pageBgImage && isDataUrl(state.pageBgImage)) {
+                var bgExt = extFromDataUrl(state.pageBgImage);
+                pageBgImgPath = 'img/cpanel-page-bg.' + bgExt;
+                zip.file(pageBgImgPath, base64FromDataUrl(state.pageBgImage), { base64: true });
+            } else if (state.pageBgImage) {
+                // si es URL externa, dejamos tal cual para que el CSS la referencie
+                pageBgImgPath = state.pageBgImage;
+            }
+
+            // ---- 2) Recorrer el manifiesto ----
             for (var i = 0; i < total; i++) {
                 var path = FILE_MANIFEST[i];
                 prog.textContent = 'Procesando ' + (i + 1) + '/' + total + ' · ' + path;
 
                 try {
+                    // Caso especial: logo subido como data URL -> sobreescribir img/logo.png
+                    if (path === 'img/logo.png' && state.logoUrl && isDataUrl(state.logoUrl)) {
+                        zip.file(path, base64FromDataUrl(state.logoUrl), { base64: true });
+                        ok++;
+                        continue;
+                    }
+
                     var data = await fetchArchivo(path);
                     if (PATCH_FILES.indexOf(path) !== -1) {
-                        data = patchearArchivo(path, data);
+                        data = patchearArchivo(path, data, pageBgImgPath);
                         zip.file(path, data);
                     } else {
                         zip.file(path, data);
@@ -951,20 +1214,17 @@
                 }
             }
 
-            // Incluir un pequeño archivo de configuración de respaldo (por si se
-            // quiere volver a cargar en otro dispositivo / navegador)
-            zip.file('admin-config.backup.json', JSON.stringify(state, null, 2));
-
+            // ---- 3) Generar el ZIP ----
             prog.textContent = 'Generando ZIP...';
             var blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 
-            // Descargar
+            // ---- 4) Descargar ----
             var a = document.createElement('a');
             var d = new Date();
             var pad = function (n) { return (n < 10 ? '0' : '') + n; };
             var stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes());
             a.href = URL.createObjectURL(blob);
-            a.download = 'cabreras-shop-export-' + stamp + '.zip';
+            a.download = 'cabreras-shop-' + stamp + '.zip';
             document.body.appendChild(a);
             a.click();
             setTimeout(function () {
@@ -972,7 +1232,7 @@
                 a.remove();
             }, 1000);
 
-            prog.innerHTML = '<span style="color: var(--admin-primary)"><i class="fas fa-check-circle"></i> Exportación completa: ' + ok + ' archivos'
+            prog.innerHTML = '<span style="color: var(--admin-primary)"><i class="fas fa-check-circle"></i> Código fuente exportado: ' + ok + ' archivos'
                 + (fail ? ' · <span style="color: var(--admin-accent)">' + fail + ' no encontrados (omitidos)</span>' : '') + '</span>';
             toast('Paquete generado correctamente', 'success');
 

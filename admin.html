@@ -79,6 +79,9 @@
             <button class="admin-tab" data-tab="whatsapp">
                 <i class="fab fa-whatsapp"></i> WhatsApp
             </button>
+            <button class="admin-tab" data-tab="apariencia">
+                <i class="fas fa-palette"></i> Apariencia
+            </button>
             <button class="admin-tab" data-tab="exportar">
                 <i class="fas fa-download"></i> Exportar
             </button>
@@ -166,6 +169,120 @@
                 </div>
             </section>
 
+            <!-- ================== TAB: APARIENCIA ================== -->
+            <section class="tab-panel" id="tab-apariencia" role="tabpanel">
+                <div class="section-title">
+                    <div>
+                        <h2>Apariencia</h2>
+                        <div class="sub">Cambia el logotipo, el fondo de la tienda y el color del panel. Los cambios se aplican en tiempo real.</div>
+                    </div>
+                </div>
+
+                <div class="appearance-grid">
+
+                    <!-- ===== LOGOTIPO ===== -->
+                    <div class="appearance-card">
+                        <h3><i class="fas fa-image"></i> Logotipo de la tienda</h3>
+                        <p class="sub">Se usa en el encabezado y en el pie de página del sitio.</p>
+
+                        <div class="logo-preview-box" id="logoPreview">
+                            <div class="placeholder">
+                                <i class="fas fa-image"></i>
+                                <span>Sin logo personalizado (se usa el original)</span>
+                            </div>
+                        </div>
+
+                        <div class="btn-row">
+                            <label class="file-input-btn btn-secondary" style="flex:1;">
+                                <i class="fas fa-upload"></i>
+                                <span>Subir imagen</span>
+                                <input type="file" id="logoFile" accept="image/*" />
+                            </label>
+                            <button type="button" class="btn-danger" id="btnQuitarLogo" title="Restaurar logo original">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                        <div class="form-field" style="margin:0;">
+                            <label for="logoUrl">o pega la URL / ruta</label>
+                            <input type="text" id="logoUrl" placeholder="./img/logo.png o https://..." />
+                        </div>
+                    </div>
+
+                    <!-- ===== FONDO DE LA PÁGINA ===== -->
+                    <div class="appearance-card">
+                        <h3><i class="fas fa-fill-drip"></i> Fondo de la página</h3>
+                        <p class="sub">Color (o imagen de fondo) que verá el cliente al visitar la tienda.</p>
+
+                        <div class="bg-preview-box" id="pageBgPreview">
+                            <span class="label">Vista previa</span>
+                        </div>
+
+                        <div class="form-field" style="margin:0;">
+                            <label for="pageBgColor">Color de fondo</label>
+                            <div class="color-row">
+                                <input type="color" id="pageBgColor" value="#fffdf7" />
+                                <input type="text" id="pageBgColorHex" placeholder="#fffdf7" />
+                            </div>
+                        </div>
+
+                        <div class="form-field" style="margin:0;">
+                            <label>Imagen de fondo (opcional)</label>
+                            <div class="btn-row">
+                                <label class="file-input-btn btn-secondary" style="flex:1;">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Subir imagen de fondo</span>
+                                    <input type="file" id="pageBgFile" accept="image/*" />
+                                </label>
+                                <button type="button" class="btn-danger" id="btnQuitarBg" title="Quitar imagen de fondo">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== COLOR DEL PANEL ===== -->
+                    <div class="appearance-card">
+                        <h3><i class="fas fa-swatchbook"></i> Color del panel</h3>
+                        <p class="sub">Color de fondo del panel de control (no afecta a la tienda pública).</p>
+
+                        <div class="form-field" style="margin:0;">
+                            <label for="adminBgColor">Color</label>
+                            <div class="color-row">
+                                <input type="color" id="adminBgColor" value="#0f172a" />
+                                <input type="text" id="adminBgColorHex" placeholder="#0f172a" />
+                            </div>
+                        </div>
+
+                        <div class="form-field" style="margin:0;">
+                            <label>Paletas rápidas</label>
+                            <div class="panel-preset-row" id="panelPresets">
+                                <button type="button" class="panel-preset" data-color="#0f172a" style="background:#0f172a" title="Azul oscuro (por defecto)"></button>
+                                <button type="button" class="panel-preset" data-color="#111827" style="background:#111827" title="Gris pizarra"></button>
+                                <button type="button" class="panel-preset" data-color="#1a1a2e" style="background:#1a1a2e" title="Noche profunda"></button>
+                                <button type="button" class="panel-preset" data-color="#1e293b" style="background:#1e293b" title="Azul acero"></button>
+                                <button type="button" class="panel-preset" data-color="#082f49" style="background:#082f49" title="Oceánico"></button>
+                                <button type="button" class="panel-preset" data-color="#14532d" style="background:#14532d" title="Bosque"></button>
+                                <button type="button" class="panel-preset" data-color="#581c87" style="background:#581c87" title="Púrpura"></button>
+                                <button type="button" class="panel-preset" data-color="#7c2d12" style="background:#7c2d12" title="Tierra"></button>
+                                <button type="button" class="panel-preset" data-color="#f8fafc" style="background:#f8fafc" title="Claro"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 18px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="btn-primary" id="btnGuardarApariencia">
+                        <i class="fas fa-save"></i>
+                        <span>Guardar cambios</span>
+                    </button>
+                    <button type="button" class="btn-secondary" id="btnRestablecerApariencia">
+                        <i class="fas fa-undo-alt"></i>
+                        <span>Restablecer valores originales</span>
+                    </button>
+                </div>
+            </section>
+
             <!-- ================== TAB: EXPORTAR ================== -->
             <section class="tab-panel" id="tab-exportar" role="tabpanel">
                 <div class="section-title">
@@ -179,10 +296,11 @@
                     <div class="export-icon"><i class="fas fa-file-archive"></i></div>
                     <h2>Generar paquete completo</h2>
                     <p>
-                        Se generará un archivo ZIP con todos los archivos de la tienda
+                        Se generará un archivo ZIP con <b>toda la estructura del código fuente</b>
                         (HTML, CSS, JavaScript, imágenes y fuentes) ya con los productos,
-                        municipios, categorías y el número de WhatsApp que configuraste en este panel.
-                        Al descomprimirlo y publicarlo, la tienda se regirá por estos archivos.
+                        municipios, categorías, número de WhatsApp, logotipo y fondo que
+                        configuraste en este panel. Al descomprimirlo y publicarlo, la tienda
+                        se regirá por estos archivos <b>sin depender del navegador</b>.
                     </p>
                     <button type="button" class="btn-primary" id="btnExportar" style="font-size:15px; padding: 14px 28px;">
                         <i class="fas fa-download"></i>
