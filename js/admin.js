@@ -50,156 +50,11 @@
     var DEFAULT_ADMIN_BG_COLOR = '#0f172a';
 
     // ------------------------------------------------------------
-    // MANIFIESTO DE ARCHIVOS DEL SITIO (para exportar)
+    // MANIFIESTO DE ARCHIVOS DEL SITIO (se carga dinámicamente desde manifest.json)
     // ------------------------------------------------------------
-    var FILE_MANIFEST = [
-        'README.md',
-        'admin.html',
-        'index.html',
-        'pareja-joven-india-carrito-compras-o-carretilla-llena-comestibles-verduras-frutas-foto-cuerpo-entero-aislado-sobre-pared-blanca_466689-7614.avif',
-        'css/admin.css',
-        'css/animate.css',
-        'css/bootstrap.min.css',
-        'css/fontawesome.css',
-        'css/main.css',
-        'css/menu.css',
-        'css/modal_cpanel.css',
-        'css/responsivo.css',
-        'css/style_cpanel.css',
-        'fonts/Poppins-Medium.otf',
-        'fonts/Poppins-Regular.otf',
-        'fonts/fa-brands-400.eot',
-        'fonts/fa-brands-400.svg',
-        'fonts/fa-brands-400.ttf',
-        'fonts/fa-brands-400.woff',
-        'fonts/fa-brands-400.woff2',
-        'fonts/fa-regular-400.eot',
-        'fonts/fa-regular-400.svg',
-        'fonts/fa-regular-400.ttf',
-        'fonts/fa-regular-400.woff',
-        'fonts/fa-regular-400.woff2',
-        'fonts/fa-solid-900.eot',
-        'fonts/fa-solid-900.svg',
-        'fonts/fa-solid-900.ttf',
-        'fonts/fa-solid-900.woff',
-        'fonts/fa-solid-900.woff2',
-        'img/Copia icone-pedido.svg',
-        'img/ana.jpg',
-        'img/ana_cpanel.jpg',
-        'img/background_cpanel.jpg',
-        'img/banner-entrega.png',
-        'img/bg-icons-1.png',
-        'img/bg-icons-2.png',
-        'img/cardapio/Antialérgicos/Ciproheptadina.jpg',
-        'img/cardapio/Antialérgicos/Loratadina.jpg',
-        'img/cardapio/Antidepresivos/Captopril.png',
-        'img/cardapio/Antidepresivos/ENALAPRIL-MALEATO-20MG-CAJA-POR-20-TABLETAS-CON-BLISTER.jpg',
-        'img/cardapio/Antidepresivos/Furosemida.jpg',
-        'img/cardapio/Dermatológicos/04IU-Nistaderm-300x300.png',
-        'img/cardapio/Dermatológicos/69298876654432239---2-.png',
-        'img/cardapio/Dermatológicos/Clotrimazol-crema.png',
-        'img/cardapio/Dermatológicos/KETOLEF_2__CREMA_X_15_G.png',
-        'img/cardapio/Dermatológicos/Permetrina.jpg',
-        'img/cardapio/Dermatológicos/aciclovir-crema.jpg',
-        'img/cardapio/Dermatológicos/mentholán con diclofenaco jalea.jpg',
-        'img/cardapio/Dermatológicos/miconazol crema.jpg',
-        'img/cardapio/Dermatológicos/piojín unguento.jpg',
-        'img/cardapio/Digestivos/Pack-RANITIDINA-comp.jpg',
-        'img/cardapio/Digestivos/Suspensi-n-Pepto-Bismol-Sabor-Original-473-ml-1-3238.jpg',
-        'img/cardapio/Digestivos/mentholán con diclofenaco jalea.jpg',
-        'img/cardapio/Digestivos/omeprazol.jpg',
-        'img/cardapio/antiinflamatorios/Diclofenaco + Paracetamol.jpg',
-        'img/cardapio/antiinflamatorios/IBUPROFENO-MK-TAB-800MG-CJAX-30UND-81001065-1.jpg',
-        'img/cardapio/antiinflamatorios/Ibuprofeno (jarabe).jpg',
-        'img/cardapio/antiinflamatorios/Paracetamol (jarabe).jpg',
-        'img/cardapio/antiinflamatorios/ZUnv5y5wXYF3KGipZn8Qu6pnhzAIMflTmMKqcdKL.png',
-        'img/cardapio/antiinflamatorios/paracetamol.jpg',
-        'img/cardapio/burguers/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg',
-        'img/cardapio/burguers/CIPROFLOXACINO-500-MG.jpg',
-        'img/cardapio/burguers/Cefalexina.jpg',
-        'img/cardapio/burguers/METRONIDAZOL-500MG.jpg',
-        'img/cardapio/burguers/Secnidazol.jpg',
-        'img/cardapio/burguers/albendazol.png',
-        'img/cardapio/burguers/amoxicilina suspención.jpg',
-        'img/cardapio/burguers/amoxicilina.jpg',
-        'img/cardapio/burguers/cefalexina suspension.jpg',
-        'img/cardapio/burguers/doxiciclina.jpg',
-        'img/cardapio/burguers/hydrocortisone cream.png',
-        'img/cardapio/burguers/lasante_azitromicina_tabletas.png',
-        'img/cardapio/burguers/mebendazol.jpg',
-        'img/cardapio/burguers/nistatina-suspension.jpg',
-        'img/cardapio/burguers/pexels-cottonbro-10610417.jpg',
-        'img/cardapio/burguers/sulfaprim.jpg',
-        'img/cardapio/outros/Amitriptilina 25 mg.jpg',
-        'img/cardapio/outros/Amitriptilina.jpg',
-        'img/cardapio/outros/Aspirina.jpg',
-        'img/cardapio/outros/Heat Wrap compresse chauffante.jpg',
-        'img/cardapio/outros/Iron spring valley.jpg',
-        'img/cardapio/outros/Prednisolona.jpg',
-        'img/cardapio/outros/VITAMINA-C-GOTAS-100-MG--COASP_L.jpg',
-        'img/cardapio/outros/Vitamina C (jarabe).jpg',
-        'img/cardapio/outros/Vitamina C.jpg',
-        'img/cardapio/outros/aceite-higado-de-bacalao-x10-tabletas-1.jpg',
-        'img/cardapio/outros/acido-folico.jpg',
-        'img/cardapio/outros/ibuprofeno(pomo).jpg',
-        'img/cardapio/outros/mentol Arthritis & muscle.jpg',
-        'img/cardapio/outros/mentol muscle rub.jpg',
-        'img/cardapio/outros/super b-complex.jpg',
-        'img/cardapio/outros/vitamin-b-12-es.jpg',
-        'img/cardapio/outros/vitamina-c-natural-life-1000-mg-100-tabletas-vitamina-c-natural-life-1000-mg-100-tabletas.jpg',
-        'img/cardapio/outros/Óvulos Clotrimazol+nistatina.jpg',
-        'img/cardapio/outros/Óvulos Clotrimazol.jpg',
-        'img/cardapio/productos agotados/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg',
-        'img/cardapio/productos agotados/AZITROMICINA.png',
-        'img/cardapio/productos agotados/agotado.png',
-        'img/cardapio/productos agotados/amitriptilina.jpg',
-        'img/cardapio/productos agotados/aviso-producto-agotado-1.jpg',
-        'img/cardapio/productos nuevos pronto/360_F_26606957_OkBZrC2SCbxo6oiRHFBMSSn42HT3v719.jpg',
-        'img/cardapio/productos nuevos pronto/images.jpg',
-        'img/diego.jpg',
-        'img/icone-carrinho-vazio.svg',
-        'img/icone-delivery.png',
-        'img/icone-delivery.svg',
-        'img/icone-delivery1.png',
-        'img/icone-pedido.png',
-        'img/icone-pedido.svg',
-        'img/icone-qualidade.png',
-        'img/icone-qualidade.svg',
-        'img/icone-reserva.svg',
-        'img/joao.jpg',
-        'img/logo.png',
-        'img/logos/873130898173009756220241028063922sst.png',
-        'img/logos/carnaval1.png',
-        'img/logos/logo09.png',
-        'img/logos/logo2.png',
-        'img/logos/logofff.png',
-        'img/logos/logox.webp',
-        'img/logos/pngtree-a-woman-using-digital-tablet-in-3d-illustration-on-transparent-background-png-image_12581961.png',
-        'img/online-shopping-text-banner-marketing-pop-art-banner-design-png.webp',
-        'img/shopping.png',
-        'img/shopping1.png',
-        'img/shopping3.png',
-        'img/time.png',
-        'img/timer.png',
-        'js/admin.js',
-        'js/app.js',
-        'js/bootstrap.min.js',
-        'js/dados.js',
-        'js/jquery-1.12.4.min.js',
-        'js/modal_cpanel.js',
-        'js/modernizr-3.5.0.min.js',
-        'js/overrides.js',
-        'js/popper.min.js',
-        'js/script.js',
-        'js/wow.min.js',
-        'src/assets/favicon.png',
-        'src/assets/icons/carrito.png',
-        'src/assets/icons/carrito1.png',
-        'src/assets/icons/favicon.png',
-        'src/assets/icons/tienda-online.png'
-    ];
+    var FILE_MANIFEST = [];
 
-    // Archivos que necesitan patcheo antes de exportar
+    // Archivos que necesitan patcheo antes de exportar (reciben texto en lugar de blob)
     var PATCH_FILES = ['index.html', 'js/dados.js', 'js/app.js'];
 
     // ------------------------------------------------------------
@@ -325,9 +180,21 @@
         state.adminBgColor    = DEFAULT_ADMIN_BG_COLOR;
     }
 
+    // Canal de sincronización en tiempo real con la tienda abierta
+    var syncChannel = null;
+    try {
+        if (typeof BroadcastChannel !== 'undefined') {
+            syncChannel = new BroadcastChannel('cshop_admin_sync');
+        }
+    } catch (e) { /* navegador antiguo */ }
+
     function saveState() {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            // Notifica a TODAS las pestañas abiertas de la tienda
+            if (syncChannel) {
+                syncChannel.postMessage({ type: 'config-updated', at: Date.now() });
+            }
         } catch (e) {
             toast('Error al guardar: ' + e.message, 'error');
             console.error(e);
@@ -1162,6 +1029,15 @@
         return await r.blob();
     }
 
+    async function cargarManifest() {
+        var r = await fetch('manifest.json', { cache: 'no-store' });
+        if (!r.ok) throw new Error('No se encontró manifest.json. Re-genéralo con el script de construcción.');
+        var data = await r.json();
+        if (!data || !Array.isArray(data.files)) throw new Error('manifest.json inválido.');
+        FILE_MANIFEST = data.files.slice();
+        return FILE_MANIFEST;
+    }
+
     async function exportarSitio() {
         var btn = $('#btnExportar');
         var prog = $('#exportProgress');
@@ -1171,6 +1047,9 @@
             if (typeof JSZip === 'undefined') {
                 throw new Error('JSZip no cargó. Revisa tu conexión a internet.');
             }
+
+            prog.textContent = 'Cargando manifiesto de archivos...';
+            await cargarManifest();
 
             var zip = new JSZip();
             var total = FILE_MANIFEST.length;

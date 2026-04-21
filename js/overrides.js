@@ -167,12 +167,30 @@
         patchearDOM(cfg);
     }
 
-    // ---------- TIEMPO REAL: recargar si cambia la config en otra pestaña ----------
+    // ---------- TIEMPO REAL ----------
+    // (1) Evento 'storage' -> dispara cuando OTRA pestaña cambia localStorage
     window.addEventListener('storage', function (ev) {
         if (ev.key === STORAGE_KEY) {
             location.reload();
         }
     });
+
+    // (2) BroadcastChannel -> canal directo entre el panel y la tienda
+    //     (mismo navegador, cualquier pestaña). Permite notificación inmediata
+    //     incluso cuando las dos páginas están en el mismo proceso.
+    try {
+        if (typeof BroadcastChannel !== 'undefined') {
+            var bc = new BroadcastChannel('cshop_admin_sync');
+            bc.addEventListener('message', function (ev) {
+                if (ev && ev.data && ev.data.type === 'config-updated') {
+                    location.reload();
+                }
+            });
+            window.__CSHOP_BC__ = bc;
+        }
+    } catch (e) {
+        console.warn('[overrides] BroadcastChannel no disponible:', e);
+    }
 
     window.__CSHOP_OVERRIDES_APPLIED__ = !!cfg;
 })();
