@@ -2455,7 +2455,7 @@ body.modal-abierto {
 
 /* ============================================= */
 /* Secciones de formulario DENTRO del modal      */
-/* (Datos de contacto + Método de pago)          */
+/* (Datos de contacto + Dirección + Método pago) */
 /* ============================================= */
 .modal-direccion-body .modal-form-section {
     margin-top: 20px;
@@ -2463,8 +2463,12 @@ body.modal-abierto {
     border-top: 1px dashed var(--color-separate);
 }
 
-.modal-direccion-body .modal-form-section:first-of-type {
-    margin-top: 18px;
+/* la primera sección visible NO debe tener separador arriba */
+.modal-direccion-body .modal-form-section-first,
+.modal-direccion-body > .modal-form-section:first-child {
+    margin-top: 4px;
+    padding-top: 0;
+    border-top: none;
 }
 
 .modal-direccion-body .modal-form-section .form-section-title {
@@ -2473,6 +2477,25 @@ body.modal-abierto {
 
 .modal-direccion-body .modal-form-section .metodo-pago-group {
     margin-top: 8px;
+}
+
+/* ============================================= */
+/* Botón deshabilitado (Revisar pedido)          */
+/* ============================================= */
+.btn.btn-disabled,
+.btn-yellow.btn-disabled {
+    background-color: #d6d6d6 !important;
+    color: #8a8a8a !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.btn.btn-disabled:hover,
+.btn-yellow.btn-disabled:hover {
+    background-color: #d6d6d6 !important;
+    color: #8a8a8a !important;
 }
 
 /* ============================================= */
