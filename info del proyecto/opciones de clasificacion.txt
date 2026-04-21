@@ -1,0 +1,6 @@
+   <li id="itemCongelados">Congelados</li>
+                        <li id="itemFrutasVerduras">Frutas y verduras</li>
+                        <li id="itemBebidas">Bebidas</li>
+                        <li id="itemLacteos">Lacteos</li>
+                        <li id="itemPasteleria">Pasteleria</li>
+                        <li id="itemDulces">Dulces</li>

@@ -1,0 +1,665 @@
+
+/* Desktop (col-lg) 992px+ */
+@media (min-width: 992px) {
+
+}
+
+/* Desktop e Tablets (col-md) 768px a 991px */
+@media (min-width: 768px) and (max-width: 991px) {
+
+}
+
+/* Tablets (col-sm) 576px a 767px */
+@media (min-width: 576px) and (max-width: 767px) {
+
+}
+
+/* Tablets e Celulares (col) 0px a 767px */
+@media (max-width: 767px) {
+
+    .no-mobile {
+        display: none!important;
+    }
+
+    .col-one {
+        padding-left: 35px!important;
+        padding-right: 35px!important;
+    }
+
+    /* Buscador en móvil */
+    .search-wrapper {
+        margin-bottom: 18px;
+    }
+
+    .search-wrapper .search-input {
+        height: 46px;
+        font-size: 14px;
+        padding: 0 44px 0 44px;
+    }
+
+    .search-wrapper .search-icon {
+        left: 16px;
+        font-size: 14px;
+    }
+
+    .search-wrapper .search-clear {
+        width: 30px;
+        height: 30px;
+        right: 8px;
+    }
+
+    /* Lightbox en móvil */
+    .lightbox {
+        padding: 12px;
+    }
+
+    .lightbox-img {
+        max-width: 95vw;
+        max-height: 75vh;
+    }
+
+    .lightbox-close {
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .lightbox-zoom {
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .lightbox.zoomed .lightbox-img {
+        transform: scale(1.5);
+    }
+
+    .lightbox-caption {
+        font-size: 14px;
+        padding: 5px 12px;
+    }
+
+    /* Tipo de entrega en móvil: una columna */
+    .tipo-entrega-group {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .tipo-entrega-card {
+        padding: 14px 16px;
+    }
+
+    .tipo-entrega-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .tipo-entrega-title {
+        font-size: 14px;
+    }
+
+    .tipo-entrega-dsc {
+        font-size: 12px;
+    }
+
+    /* Municipios en móvil: más estrechos */
+    .lista-municipios {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .municipio-chip {
+        padding: 9px 10px;
+    }
+
+    .municipio-chip-nome {
+        font-size: 12px;
+    }
+
+    .municipio-chip-preco {
+        font-size: 13px;
+    }
+
+    /* Bloque de entrega en móvil */
+    .bloque-entrega {
+        padding: 14px;
+    }
+
+    /* Secciones del formulario en móvil */
+    .form-section {
+        margin-bottom: 18px;
+    }
+
+    .form-section-title {
+        gap: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+
+    .form-section-num {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .form-section-label {
+        font-size: 15px;
+    }
+
+    .form-section .form-group label {
+        font-size: 13px;
+    }
+
+    /* Botón "Vaciar carrito" en móvil */
+    .acciones-carrinho-wrap {
+        justify-content: center;
+        padding: 8px 0 16px 0;
+    }
+
+    .btn-vaciar-carrinho {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 11px 18px;
+        font-size: 13px;
+    }
+
+    /* Resumen detallado en móvil */
+    .resumo-section-title {
+        font-size: 15px;
+        margin-top: 18px;
+        margin-bottom: 12px;
+    }
+
+    .resumo-section-title i {
+        font-size: 16px;
+    }
+
+    .resumo-datos {
+        padding: 12px 14px;
+    }
+
+    .resumo-dato-row {
+        grid-template-columns: 20px 1fr;
+        grid-template-rows: auto auto;
+        gap: 4px 10px;
+        padding: 10px 0;
+        font-size: 13px;
+    }
+
+    .resumo-dato-row .resumo-dato-icon {
+        grid-row: 1 / span 2;
+        align-self: start;
+        padding-top: 2px;
+    }
+
+    .resumo-dato-label {
+        grid-column: 2;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .resumo-dato-value {
+        grid-column: 2;
+        font-size: 14px;
+    }
+
+    .resumo-totais {
+        padding: 14px 16px;
+    }
+
+    .resumo-total-row {
+        font-size: 14px;
+    }
+
+    .resumo-total-row.resumo-total-final {
+        font-size: 16px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .resumo-total-row.resumo-total-final .resumo-total-value {
+        font-size: 20px;
+    }
+
+    .info-local {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .info-local-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    .info-local-title {
+        font-size: 15px;
+    }
+
+    .info-local-addr,
+    .info-local-hours,
+    .info-local-nota {
+        font-size: 13px;
+    }
+
+    .navbar-toggler-icon {
+        padding-top: 5px;
+    }
+
+    .navbar-collapse {
+        background-color: var(--color-secondary);
+        padding: 20px;
+        text-align: center;
+        border-radius: 40px;
+    }
+
+    .navbar-collapse .btn-white {
+        margin-top: 20px;
+    }
+
+    .navbar-collapse .btn-icon {
+        padding-right: 20px;
+    }
+
+    .navbar-collapse .btn-icon span.icon {
+        display: none;
+    }
+
+    .banner {
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .text-banner h1 {
+        font-size: 36px;
+    }
+
+    .text-banner p {
+        font-size: 18px;
+    }
+
+    .btn-yellow, .btn-white {
+        padding: 13px 23px;
+        font-size: 18px;
+    }
+
+    .btn-icon-left span.icon-left {
+        width: 43px;
+        height: 43px;
+        margin-left: -56px;
+    }
+
+    .btn-icon-left {
+        padding-left: 63px!important;
+    }
+
+    .title {
+        font-size: 30px;
+    }
+
+    .servicos {
+        padding-bottom: 50px;
+    }
+
+    .cardapio {
+        padding-bottom: 50px;
+    }
+
+    .container-menu {
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 15px;
+        gap: 10px;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    .container-menu .menu-categoria {
+        flex-shrink: 0;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .container-menu .menu-categoria .menu-label {
+        white-space: nowrap;
+    }
+
+    /* Tarjeta horizontal en móvil */
+    .card-item {
+        min-height: auto !important;
+        height: auto;
+        padding: 14px 14px 14px 120px !important;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch !important;
+        justify-content: center;
+    }
+
+    .card-item .img-produto {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 6px;
+        width: 100px;
+        margin-top: 0;
+    }
+
+    .card-item .img-produto img {
+        width: 80px;
+        max-height: 80px;
+    }
+
+    .card-item .card-badge-categoria {
+        align-self: flex-start;
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .card-item .badge-in-cart {
+        top: 8px;
+        right: 8px;
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .card-item .title-produto {
+        margin-top: 8px !important;
+        margin-bottom: 2px !important;
+        height: auto !important;
+        width: 100%;
+        text-align: left !important;
+        font-size: 14px;
+    }
+
+    .card-item .price-produto {
+        margin-bottom: 10px !important;
+        margin-top: 0px !important;
+        font-size: 20px !important;
+        text-align: left !important;
+    }
+
+    .card-item .add-carrinho {
+        flex-direction: row !important;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .card-item .quantidade-wrapper {
+        align-self: center;
+        flex-shrink: 0;
+    }
+
+    .card-item .btn-menos,
+    .card-item .btn-mais {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .card-item .add-numero-itens {
+        padding: 4px 10px;
+        min-width: 36px;
+        font-size: 15px;
+    }
+
+    .card-item .btn-add {
+        flex: 1;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .card-item .btn-add .btn-add-label {
+        display: none;
+    }
+
+    .card-item .btn-add i {
+        font-size: 16px;
+    }
+
+    #itensCardapio .mb-5 {
+        margin-bottom: 15px!important;
+    }
+
+    .depoimentos {
+        padding-bottom: 50px;
+    }
+
+    .reserva {
+        padding-bottom: 50px;
+    }
+
+    .card-secondary {
+        padding: 45px;
+        border-radius: 50px;
+    }
+
+    .container-logo-footer {
+        justify-content: center;
+    }
+
+    .container-texto-footer p {
+        text-align: center;
+    }
+
+    .container-redes-footer {
+        margin-top: 40px;
+        margin-bottom: 50px;
+        justify-content: center;
+    }
+
+    .modal-full {
+        padding: 40px;
+    }
+
+    .modal-full .item-carrinho {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .modal-full .img-produto {
+        position: relative;
+        left: 0;
+    }
+
+    .modal-full .img-produto img {
+        width: 50px;
+    }
+
+    .modal-full .dados-produto {
+        padding-left: 15px;
+        padding-right: 15px;
+        display: grid;
+    }
+
+    .modal-full .title-produto, .modal-full .price-produto {
+        font-size: 16px!important;
+    }
+
+    .modal-full .add-numero-itens {
+        padding: 2px 10px;
+    }
+
+    .modal-full .form-control {
+        font-size: 16px;
+    }
+
+    /* Método de pago (tarjetas) en móvil - una columna */
+    .metodo-pago-group {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .metodo-pago-card {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .metodo-pago-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .metodo-pago-title {
+        font-size: 14px;
+    }
+
+    .metodo-pago-dsc {
+        font-size: 11px;
+    }
+
+    /* Dirección confirmada - reorganizar en móvil */
+    .direccion-confirmada-body {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .direccion-confirmada-texto {
+        flex: 1 1 calc(100% - 60px);
+    }
+
+    .btn-editar-direccion {
+        flex: 1 1 100%;
+        justify-content: center;
+        margin-top: 4px;
+    }
+
+    /* MODAL dirección en móvil */
+    .modal-direccion-overlay {
+        padding: 10px;
+    }
+
+    .modal-direccion-dialog {
+        max-height: calc(100vh - 20px);
+        border-radius: 14px;
+    }
+
+    .modal-direccion-header {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .modal-direccion-header-texto {
+        gap: 10px;
+    }
+
+    .modal-direccion-header-texto > i {
+        font-size: 18px;
+    }
+
+    .modal-direccion-header h3 {
+        font-size: 16px;
+    }
+
+    .modal-direccion-header p {
+        font-size: 11px;
+    }
+
+    .modal-direccion-close {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .modal-direccion-body {
+        padding: 16px;
+    }
+
+    .modal-direccion-body .form-control {
+        padding: 11px 16px;
+        font-size: 15px;
+    }
+
+    .modal-direccion-footer {
+        padding: 12px 16px;
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .btn-modal-cancelar,
+    .btn-modal-confirmar {
+        width: 100%;
+        justify-content: center;
+        padding: 11px 18px;
+    }
+
+    /* Lista municipios scrollable dentro del modal si hay muchas opciones */
+    .modal-direccion-body .lista-municipios {
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    /* Teléfono: selector país + input - apilar en móvil */
+    .telefono-input-wrap {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-control-country {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .telefono-feedback {
+        font-size: 11px;
+    }
+
+    /* Ventajas local - 1 columna en móvil */
+    .ventajas-local {
+        grid-template-columns: 1fr;
+    }
+
+    .info-local-modal {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .info-local-modal .info-local-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .info-local-modal .info-local-title {
+        font-size: 15px;
+    }
+
+    .info-local-modal .info-local-addr,
+    .info-local-modal .info-local-hours,
+    .info-local-modal .info-local-nota {
+        font-size: 13px;
+    }
+
+    /* Hint entrega - móvil */
+    .hint-entrega {
+        font-size: 12px;
+        padding: 9px 11px;
+    }
+
+}
+
+/* ================= TABLETS: 768px - 991px ================= */
+@media (min-width: 768px) and (max-width: 991.98px) {
+
+    .modal-direccion-dialog {
+        max-width: 680px;
+    }
+
+    .metodo-pago-group {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
