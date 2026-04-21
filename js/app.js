@@ -87,6 +87,7 @@ var CATEGORIAS = {
 cardapio.eventos = {
 
     init: () => {
+        cardapio.metodos.renderBarraCategorias();
         cardapio.metodos.atualizarContadoresCategorias();
         cardapio.metodos.obterItensCardapio();
         cardapio.metodos.carregarBotaoLigar();
@@ -117,6 +118,41 @@ cardapio.eventos = {
 
 cardapio.metodos = {
 
+    // renderiza la barra de categorías (chips clicables) a partir de CATEGORIAS
+    renderBarraCategorias: () => {
+        let $cont = $("#barraCategoriasMenu");
+        if ($cont.length === 0) return;
+
+        let keys = Object.keys(CATEGORIAS || {});
+        let html = '';
+        keys.forEach((key, idx) => {
+            let info = CATEGORIAS[key] || {};
+            let nome = cardapio.metodos.escapeHTML(info.nome || key);
+            let icone = info.icone || 'fas fa-tag';
+            let activeCls = (idx === 0) ? ' active' : '';
+            let safeKey = String(key).replace(/'/g, "\\'");
+            html += `
+                <a id="menu-${cardapio.metodos.escapeHTML(key)}" class="btn btn-white btn-sm mr-3${activeCls} menu-categoria" onclick="cardapio.metodos.obterItensCardapio('${safeKey}')">
+                    <i class="${cardapio.metodos.escapeHTML(icone)} menu-icon"></i>
+                    <span class="menu-label">${nome}</span>
+                    <span class="menu-count">0</span>
+                </a>
+            `;
+        });
+        $cont.html(html);
+    },
+
+    // pequeño helper para escapar HTML en strings dinámicas
+    escapeHTML: (str) => {
+        if (str === undefined || str === null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+
     // actualizar el contador (badge) de cada categoría en el menú
     atualizarContadoresCategorias: () => {
         $.each(CATEGORIAS, (key, info) => {
@@ -129,7 +165,13 @@ cardapio.metodos = {
     },
 
     // obtener la lista de elementos del menú
-    obterItensCardapio: (categoria = 'burgers', vermais = false) => {
+    obterItensCardapio: (categoria, vermais = false) => {
+
+        // si no se pasó categoría o no existe, usar la primera disponible
+        if (!categoria || !CATEGORIAS[categoria]) {
+            let primerKey = Object.keys(CATEGORIAS || {})[0];
+            categoria = primerKey || 'burgers';
+        }
 
         // si el usuario pulsa una categoría, salir del modo búsqueda
         if (!vermais) {

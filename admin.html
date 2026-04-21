@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de administración - Cabrera's Shop</title>
+
+    <link rel="shortcut icon" href="./src/assets/icons/carrito.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/fontawesome.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <div id="admToastContainer"></div>
+
+    <!-- ============ VISTA LOGIN ============ -->
+    <section id="admLoginView" class="adm-login-wrap">
+        <div class="adm-login-card">
+            <div class="adm-logo"><i class="fas fa-user-shield"></i></div>
+            <h1>Panel de administración</h1>
+            <p class="adm-sub">Ingresa tus credenciales para continuar.</p>
+
+            <form id="admLoginForm" class="adm-login-form" autocomplete="on">
+                <label for="admLoginUser">Usuario</label>
+                <input id="admLoginUser" name="user" type="text" required autocomplete="username" />
+
+                <label for="admLoginPass">Contraseña</label>
+                <input id="admLoginPass" name="password" type="password" required autocomplete="current-password" />
+
+                <div id="admLoginError" class="adm-login-error">
+                    Usuario o contraseña incorrectos.
+                </div>
+
+                <button type="submit" class="adm-btn adm-btn-primary adm-btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+
+            <div class="adm-login-hint">
+                <b>Credenciales iniciales:</b> usuario <code>admin</code>, contraseña <code>admin123</code>.<br>
+                Cámbialas en la sección "Cuenta" una vez dentro.
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ PANEL ============ -->
+    <section id="admPanelView" class="adm-shell" hidden>
+
+        <!-- Sidebar -->
+        <aside class="adm-sidebar">
+            <h2><i class="fas fa-store"></i> Admin Tienda</h2>
+
+            <button class="adm-nav-btn active" data-section="whatsapp"><i class="fas fa-cog"></i> Ajustes generales</button>
+            <button class="adm-nav-btn" data-section="categorias"><i class="fas fa-layer-group"></i> Categorías</button>
+            <button class="adm-nav-btn" data-section="productos"><i class="fas fa-boxes"></i> Productos</button>
+            <button class="adm-nav-btn" data-section="municipios"><i class="fas fa-map-marked-alt"></i> Municipios</button>
+            <button class="adm-nav-btn" data-section="cuenta"><i class="fas fa-user-lock"></i> Cuenta</button>
+
+            <div class="adm-sep"></div>
+
+            <button class="adm-nav-btn" id="admBtnIrTienda"><i class="fas fa-external-link-alt"></i> Ver tienda</button>
+            <button class="adm-nav-btn" id="admBtnLogout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+
+            <div class="adm-sidebar-footer">
+                Los cambios se guardan y aplican automáticamente. Usa "Exportar" para descargar el sitio completo.
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="adm-main">
+
+            <div class="adm-topbar">
+                <h1 id="admSectionTitle">Panel</h1>
+                <div class="adm-topbar-actions">
+                    <button class="adm-btn" id="admBtnResetConfig" title="Restaurar todo a valores iniciales">
+                        <i class="fas fa-undo"></i> Restaurar
+                    </button>
+                    <button class="adm-btn adm-btn-accent" id="admBtnExportar" title="Descargar código fuente con los cambios">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- ====== Sección: Ajustes generales (WhatsApp) ====== -->
+            <section class="adm-section" data-section="whatsapp">
+                <div class="adm-card">
+                    <h3>Ajustes generales</h3>
+                    <p class="adm-card-sub">Número al que se envían los pedidos por WhatsApp y nombre visible de la tienda.</p>
+
+                    <div class="adm-row">
+                        <div class="adm-field">
+                            <label>Número de WhatsApp (con código de país, sin +)</label>
+                            <input class="adm-input" id="admWhatsappNumero" type="tel" inputmode="numeric" placeholder="ej: 5355135487" />
+                            <span class="adm-help">Solo dígitos. Ejemplo: <code>5355135487</code> (Cuba +53).</span>
+                        </div>
+
+                        <div class="adm-field">
+                            <label>Nombre de la tienda</label>
+                            <input class="adm-input" id="admStoreName" type="text" placeholder="Cabrera's Shop" />
+                            <span class="adm-help">Se muestra en el título de la pestaña y en mensajes.</span>
+                        </div>
+                    </div>
+
+                    <button class="adm-btn adm-btn-primary" id="admBtnSaveWhatsapp">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </section>
+
+            <!-- ====== Sección: Categorías ====== -->
+            <section class="adm-section" data-section="categorias" hidden>
+                <div class="adm-card">
+                    <div class="adm-flex" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3>Categorías</h3>
+                            <p class="adm-card-sub" style="margin: 0;">Administra las categorías del menú principal.</p>
+                        </div>
+                        <button class="adm-btn adm-btn-primary" id="admBtnNewCategoria">
+                            <i class="fas fa-plus"></i> Nueva categoría
+                        </button>
+                    </div>
+
+                    <div class="adm-table-wrap adm-mt">
+                        <table class="adm-table">
+                            <thead>
+                                <tr>
+                                    <th>Clave</th>
+                                    <th>Nombre</th>
+                                    <th>Ícono</th>
+                                    <th>Productos</th>
+                                    <th style="width: 140px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admCategoriasBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== Sección: Productos ====== -->
+            <section class="adm-section" data-section="productos" hidden>
+                <div class="adm-card">
+                    <div class="adm-flex" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3>Productos</h3>
+                            <p class="adm-card-sub" style="margin: 0;">Agrega, edita o elimina productos. Las imágenes pueden subirse o enlazarse por URL.</p>
+                        </div>
+                        <button class="adm-btn adm-btn-primary" id="admBtnNewProducto">
+                            <i class="fas fa-plus"></i> Nuevo producto
+                        </button>
+                    </div>
+
+                    <div class="adm-row adm-mt">
+                        <div class="adm-field" style="margin-bottom: 0;">
+                            <label>Filtrar por categoría</label>
+                            <select class="adm-select" id="admFiltroCategoria"></select>
+                        </div>
+                        <div class="adm-field" style="margin-bottom: 0;">
+                            <label>Buscar</label>
+                            <input class="adm-input" id="admFiltroTexto" type="search" placeholder="Nombre o descripción..." />
+                        </div>
+                    </div>
+
+                    <div class="adm-table-wrap adm-mt">
+                        <table class="adm-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 64px;">Img</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th style="width: 140px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admProductosBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== Sección: Municipios ====== -->
+            <section class="adm-section" data-section="municipios" hidden>
+                <div class="adm-card">
+                    <div class="adm-flex" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3>Municipios (La Habana)</h3>
+                            <p class="adm-card-sub" style="margin: 0;">Controla los municipios disponibles para entrega a domicilio y su costo de envío.</p>
+                        </div>
+                        <button class="adm-btn adm-btn-primary" id="admBtnNewMunicipio">
+                            <i class="fas fa-plus"></i> Nuevo municipio
+                        </button>
+                    </div>
+
+                    <div class="adm-table-wrap adm-mt">
+                        <table class="adm-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Costo envío</th>
+                                    <th style="width: 140px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admMunicipiosBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== Sección: Cuenta ====== -->
+            <section class="adm-section" data-section="cuenta" hidden>
+                <div class="adm-card" style="max-width: 520px;">
+                    <h3>Cuenta de administración</h3>
+                    <p class="adm-card-sub">Cambia el usuario y/o la contraseña del panel.</p>
+
+                    <div class="adm-field">
+                        <label>Usuario</label>
+                        <input class="adm-input" id="admAccountUser" type="text" autocomplete="username" />
+                    </div>
+                    <div class="adm-field">
+                        <label>Nueva contraseña</label>
+                        <input class="adm-input" id="admAccountPass" type="password" autocomplete="new-password" placeholder="Mínimo 4 caracteres" />
+                    </div>
+                    <div class="adm-field">
+                        <label>Confirmar contraseña</label>
+                        <input class="adm-input" id="admAccountPass2" type="password" autocomplete="new-password" />
+                    </div>
+
+                    <button class="adm-btn adm-btn-primary" id="admBtnSaveCuenta">
+                        <i class="fas fa-save"></i> Actualizar credenciales
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </section>
+
+    <!-- ============ MODAL GENÉRICO ============ -->
+    <div class="adm-modal" id="admModal" role="dialog" aria-modal="true">
+        <div class="adm-modal-content">
+            <div class="adm-modal-header">
+                <h3 id="admModalTitle">Editar</h3>
+                <button class="adm-modal-close" id="admModalClose" aria-label="Cerrar">&times;</button>
+            </div>
+            <div id="admModalBody"></div>
+            <div class="adm-modal-footer">
+                <button class="adm-btn" id="admModalCancel">Cancelar</button>
+                <button class="adm-btn adm-btn-primary" id="admModalSave">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSZip desde CDN para el exportador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/admin.js"></script>
+
+</body>
+</html>

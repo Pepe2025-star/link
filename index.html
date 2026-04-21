@@ -251,42 +251,9 @@
                 </div>
             </div>
 
-            <div class="col-12 col-one container-menu wow fadeInUp">
-                <a id="menu-burgers" class="btn btn-white btn-sm mr-3 active menu-categoria" onclick="cardapio.metodos.obterItensCardapio('burgers')">
-                    <i class="fas fa-capsules menu-icon"></i>
-                    <span class="menu-label">Antimicrobianos</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-pizzas" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('pizzas')">
-                    <i class="fas fa-pills menu-icon"></i>
-                    <span class="menu-label">Antiinflamatorios</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-churrasco" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('churrasco')">
-                    <i class="fas fa-allergies menu-icon"></i>
-                    <span class="menu-label">Antialérgicos</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-steaks" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('steaks')">
-                    <i class="fas fa-heartbeat menu-icon"></i>
-                    <span class="menu-label">Antihipertensivo</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-bebidas" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('bebidas')">
-                    <i class="fas fa-prescription-bottle menu-icon"></i>
-                    <span class="menu-label">Digestivos</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-sobremesas" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('sobremesas')">
-                    <i class="fas fa-hand-holding-medical menu-icon"></i>
-                    <span class="menu-label">Dermatológicos</span>
-                    <span class="menu-count">0</span>
-                </a>
-                <a id="menu-outros" class="btn btn-white btn-sm mr-3 menu-categoria" onclick="cardapio.metodos.obterItensCardapio('outros')">
-                    <i class="fas fa-notes-medical menu-icon"></i>
-                    <span class="menu-label">Otros</span>
-                    <span class="menu-count">0</span>
-                </a>
+            <div class="col-12 col-one container-menu wow fadeInUp" id="barraCategoriasMenu">
+                <!-- Las categorías se renderizan dinámicamente por JS
+                     (ver cardapio.metodos.renderBarraCategorias en app.js) -->
             </div>
 
 
@@ -914,6 +881,11 @@
 </div>
 
 
+    <!-- Botón flotante discreto para ir al panel de administración -->
+    <a href="admin.html" class="botao-admin" title="Panel de administración" aria-label="Panel de administración">
+        <i class="fas fa-user-shield"></i>
+    </a>
+
     <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="js/modernizr-3.5.0.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -921,6 +893,7 @@
     <script type="text/javascript" src="js/wow.min.js"></script>
     <script type="text/javascript" src="js/dados.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
 
     <script>new WOW().init();</script>
