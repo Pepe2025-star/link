@@ -50,9 +50,118 @@
     var DEFAULT_ADMIN_BG_COLOR = '#0f172a';
 
     // ------------------------------------------------------------
-    // MANIFIESTO DE ARCHIVOS DEL SITIO (se carga dinámicamente desde manifest.json)
+    // MANIFIESTO DE ARCHIVOS DEL SITIO
+    // Se carga dinámicamente desde manifest.json. Si falla (p.ej. abierto
+    // desde file://), se usa esta lista embebida como respaldo para que
+    // la exportación nunca quede bloqueada con "Failed to fetch".
     // ------------------------------------------------------------
-    var FILE_MANIFEST = [];
+    var FILE_MANIFEST_EMBEDDED = [
+        "README.md",
+        "admin.html",
+        "index.html",
+        "manifest.json",
+        "pareja-joven-india-carrito-compras-o-carretilla-llena-comestibles-verduras-frutas-foto-cuerpo-entero-aislado-sobre-pared-blanca_466689-7614.avif",
+        "css/admin.css", "css/animate.css", "css/bootstrap.min.css", "css/fontawesome.css",
+        "css/main.css", "css/menu.css", "css/modal_cpanel.css", "css/responsivo.css",
+        "css/style_cpanel.css",
+        "fonts/Poppins-Medium.otf", "fonts/Poppins-Regular.otf",
+        "fonts/fa-brands-400.eot", "fonts/fa-brands-400.svg", "fonts/fa-brands-400.ttf",
+        "fonts/fa-brands-400.woff", "fonts/fa-brands-400.woff2",
+        "fonts/fa-regular-400.eot", "fonts/fa-regular-400.svg", "fonts/fa-regular-400.ttf",
+        "fonts/fa-regular-400.woff", "fonts/fa-regular-400.woff2",
+        "fonts/fa-solid-900.eot", "fonts/fa-solid-900.svg", "fonts/fa-solid-900.ttf",
+        "fonts/fa-solid-900.woff", "fonts/fa-solid-900.woff2",
+        "img/Copia icone-pedido.svg", "img/ana.jpg", "img/ana_cpanel.jpg",
+        "img/background_cpanel.jpg", "img/banner-entrega.png",
+        "img/bg-icons-1.png", "img/bg-icons-2.png",
+        "img/cardapio/Antialérgicos/Ciproheptadina.jpg",
+        "img/cardapio/Antialérgicos/Loratadina.jpg",
+        "img/cardapio/Antidepresivos/Captopril.png",
+        "img/cardapio/Antidepresivos/ENALAPRIL-MALEATO-20MG-CAJA-POR-20-TABLETAS-CON-BLISTER.jpg",
+        "img/cardapio/Antidepresivos/Furosemida.jpg",
+        "img/cardapio/Dermatológicos/04IU-Nistaderm-300x300.png",
+        "img/cardapio/Dermatológicos/69298876654432239---2-.png",
+        "img/cardapio/Dermatológicos/Clotrimazol-crema.png",
+        "img/cardapio/Dermatológicos/KETOLEF_2__CREMA_X_15_G.png",
+        "img/cardapio/Dermatológicos/Permetrina.jpg",
+        "img/cardapio/Dermatológicos/aciclovir-crema.jpg",
+        "img/cardapio/Dermatológicos/mentholán con diclofenaco jalea.jpg",
+        "img/cardapio/Dermatológicos/miconazol crema.jpg",
+        "img/cardapio/Dermatológicos/piojín unguento.jpg",
+        "img/cardapio/Digestivos/Pack-RANITIDINA-comp.jpg",
+        "img/cardapio/Digestivos/Suspensi-n-Pepto-Bismol-Sabor-Original-473-ml-1-3238.jpg",
+        "img/cardapio/Digestivos/mentholán con diclofenaco jalea.jpg",
+        "img/cardapio/Digestivos/omeprazol.jpg",
+        "img/cardapio/antiinflamatorios/Diclofenaco + Paracetamol.jpg",
+        "img/cardapio/antiinflamatorios/IBUPROFENO-MK-TAB-800MG-CJAX-30UND-81001065-1.jpg",
+        "img/cardapio/antiinflamatorios/Ibuprofeno (jarabe).jpg",
+        "img/cardapio/antiinflamatorios/Paracetamol (jarabe).jpg",
+        "img/cardapio/antiinflamatorios/ZUnv5y5wXYF3KGipZn8Qu6pnhzAIMflTmMKqcdKL.png",
+        "img/cardapio/antiinflamatorios/paracetamol.jpg",
+        "img/cardapio/burguers/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg",
+        "img/cardapio/burguers/CIPROFLOXACINO-500-MG.jpg",
+        "img/cardapio/burguers/Cefalexina.jpg",
+        "img/cardapio/burguers/METRONIDAZOL-500MG.jpg",
+        "img/cardapio/burguers/Secnidazol.jpg",
+        "img/cardapio/burguers/albendazol.png",
+        "img/cardapio/burguers/amoxicilina suspención.jpg",
+        "img/cardapio/burguers/amoxicilina.jpg",
+        "img/cardapio/burguers/cefalexina suspension.jpg",
+        "img/cardapio/burguers/doxiciclina.jpg",
+        "img/cardapio/burguers/hydrocortisone cream.png",
+        "img/cardapio/burguers/lasante_azitromicina_tabletas.png",
+        "img/cardapio/burguers/mebendazol.jpg",
+        "img/cardapio/burguers/nistatina-suspension.jpg",
+        "img/cardapio/burguers/pexels-cottonbro-10610417.jpg",
+        "img/cardapio/burguers/sulfaprim.jpg",
+        "img/cardapio/outros/Amitriptilina 25 mg.jpg",
+        "img/cardapio/outros/Amitriptilina.jpg",
+        "img/cardapio/outros/Aspirina.jpg",
+        "img/cardapio/outros/Heat Wrap compresse chauffante.jpg",
+        "img/cardapio/outros/Iron spring valley.jpg",
+        "img/cardapio/outros/Prednisolona.jpg",
+        "img/cardapio/outros/VITAMINA-C-GOTAS-100-MG--COASP_L.jpg",
+        "img/cardapio/outros/Vitamina C (jarabe).jpg",
+        "img/cardapio/outros/Vitamina C.jpg",
+        "img/cardapio/outros/aceite-higado-de-bacalao-x10-tabletas-1.jpg",
+        "img/cardapio/outros/acido-folico.jpg",
+        "img/cardapio/outros/ibuprofeno(pomo).jpg",
+        "img/cardapio/outros/mentol Arthritis & muscle.jpg",
+        "img/cardapio/outros/mentol muscle rub.jpg",
+        "img/cardapio/outros/super b-complex.jpg",
+        "img/cardapio/outros/vitamin-b-12-es.jpg",
+        "img/cardapio/outros/vitamina-c-natural-life-1000-mg-100-tabletas-vitamina-c-natural-life-1000-mg-100-tabletas.jpg",
+        "img/cardapio/outros/Óvulos Clotrimazol+nistatina.jpg",
+        "img/cardapio/outros/Óvulos Clotrimazol.jpg",
+        "img/cardapio/productos agotados/AZITROMICINA-500MG-CAJA-POR-3-TABLETAS-INCLINADO.jpg",
+        "img/cardapio/productos agotados/AZITROMICINA.png",
+        "img/cardapio/productos agotados/agotado.png",
+        "img/cardapio/productos agotados/amitriptilina.jpg",
+        "img/cardapio/productos agotados/aviso-producto-agotado-1.jpg",
+        "img/cardapio/productos nuevos pronto/360_F_26606957_OkBZrC2SCbxo6oiRHFBMSSn42HT3v719.jpg",
+        "img/cardapio/productos nuevos pronto/images.jpg",
+        "img/diego.jpg",
+        "img/icone-carrinho-vazio.svg", "img/icone-delivery.png", "img/icone-delivery.svg",
+        "img/icone-delivery1.png", "img/icone-pedido.png", "img/icone-pedido.svg",
+        "img/icone-qualidade.png", "img/icone-qualidade.svg", "img/icone-reserva.svg",
+        "img/joao.jpg", "img/logo.png",
+        "img/logos/873130898173009756220241028063922sst.png",
+        "img/logos/carnaval1.png", "img/logos/logo09.png",
+        "img/logos/logo2.png", "img/logos/logofff.png", "img/logos/logox.webp",
+        "img/logos/pngtree-a-woman-using-digital-tablet-in-3d-illustration-on-transparent-background-png-image_12581961.png",
+        "img/online-shopping-text-banner-marketing-pop-art-banner-design-png.webp",
+        "img/shopping.png", "img/shopping1.png", "img/shopping3.png",
+        "img/time.png", "img/timer.png",
+        "js/Copia app.js", "js/admin.js", "js/app.js", "js/bootstrap.min.js",
+        "js/dados.js", "js/jquery-1.12.4.min.js", "js/modal_cpanel.js",
+        "js/modernizr-3.5.0.min.js", "js/overrides.js", "js/popper.min.js",
+        "js/script.js", "js/wow.min.js",
+        "src/assets/favicon.png", "src/assets/icons/carrito.png",
+        "src/assets/icons/carrito1.png", "src/assets/icons/favicon.png",
+        "src/assets/icons/tienda-online.png"
+    ];
+
+    var FILE_MANIFEST = FILE_MANIFEST_EMBEDDED.slice();
 
     // Archivos que necesitan patcheo antes de exportar (reciben texto en lugar de blob)
     var PATCH_FILES = ['index.html', 'js/dados.js', 'js/app.js'];
@@ -1021,21 +1130,49 @@
         return texto;
     }
 
+    function encodePath(path) {
+        // Codifica cada segmento para URLs. encodeURI no codifica '#' ni '?',
+        // así que hacemos un pase extra para eso.
+        return path.split('/').map(function (seg) {
+            return encodeURIComponent(seg)
+                .replace(/%2F/g, '/')   // por si el segmento ya venía con /
+                .replace(/'/g, '%27');
+        }).join('/');
+    }
+
     async function fetchArchivo(path) {
-        var encoded = path.split('/').map(encodeURIComponent).join('/');
-        var r = await fetch(encoded, { cache: 'no-store' });
+        var url = encodePath(path);
+        var r;
+        try {
+            r = await fetch(url, { cache: 'no-store' });
+        } catch (e) {
+            // TypeError: Failed to fetch (red, file://, CORS...)
+            throw new Error('Red: ' + (e && e.message ? e.message : e));
+        }
         if (!r.ok) throw new Error('HTTP ' + r.status + ' al obtener ' + path);
         if (PATCH_FILES.indexOf(path) !== -1) return await r.text();
         return await r.blob();
     }
 
     async function cargarManifest() {
-        var r = await fetch('manifest.json', { cache: 'no-store' });
-        if (!r.ok) throw new Error('No se encontró manifest.json. Re-genéralo con el script de construcción.');
-        var data = await r.json();
-        if (!data || !Array.isArray(data.files)) throw new Error('manifest.json inválido.');
-        FILE_MANIFEST = data.files.slice();
-        return FILE_MANIFEST;
+        // Intenta cargar manifest.json del servidor. Si falla por cualquier
+        // motivo (red, file://, CORS), cae silenciosamente al manifiesto
+        // embebido para que la exportación nunca quede bloqueada.
+        try {
+            var r = await fetch('manifest.json', { cache: 'no-store' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            var data = await r.json();
+            if (data && Array.isArray(data.files) && data.files.length) {
+                FILE_MANIFEST = data.files.slice();
+                console.log('[admin] manifest.json cargado:', FILE_MANIFEST.length, 'archivos');
+                return FILE_MANIFEST;
+            }
+            throw new Error('manifest.json sin lista de archivos');
+        } catch (e) {
+            console.warn('[admin] No se pudo leer manifest.json, usando lista embebida. Motivo:', e && e.message);
+            FILE_MANIFEST = FILE_MANIFEST_EMBEDDED.slice();
+            return FILE_MANIFEST;
+        }
     }
 
     async function exportarSitio() {
@@ -1091,6 +1228,10 @@
                     console.warn('[export] No se pudo incluir', path, err);
                     fail++;
                 }
+            }
+
+            if (ok === 0) {
+                throw new Error('No se pudo descargar ningún archivo del servidor. Asegúrate de abrir el panel desde el sitio publicado o desde un servidor local (no desde file://).');
             }
 
             // ---- 3) Generar el ZIP ----
