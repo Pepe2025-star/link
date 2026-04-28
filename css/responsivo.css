@@ -141,6 +141,23 @@
         padding-bottom: 10px;
     }
 
+    /* Footer del carrito (totales y botones) - móvil */
+    .container-total {
+        padding-top: 14px;
+    }
+
+    .container-total p {
+        font-size: 14px;
+    }
+
+    .container-total .texto-total {
+        font-size: 18px;
+    }
+
+    .container-total .valor-total {
+        font-size: 20px;
+    }
+
     .form-section-num {
         width: 28px;
         height: 28px;
@@ -649,6 +666,81 @@
         padding: 9px 11px;
     }
 
+    /* ============================================= */
+    /* RESUMEN DEL PEDIDO - Responsive móvil         */
+    /* ============================================= */
+    
+    /* Caja número de orden */
+    .resumo-orden-box {
+        padding: 14px 16px;
+        gap: 12px;
+        border-radius: 12px;
+        margin: 6px 0 18px 0;
+    }
+
+    .resumo-orden-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .resumo-orden-icon i {
+        font-size: 16px;
+    }
+
+    .resumo-orden-label {
+        font-size: 11px;
+    }
+
+    .resumo-orden-valor {
+        font-size: 15px;
+    }
+
+    /* Títulos de sección del resumen */
+    .resumo-section-title {
+        margin-top: 16px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        font-size: 15px;
+        gap: 8px;
+    }
+
+    .resumo-section-title i {
+        font-size: 16px;
+        width: 20px;
+    }
+
+    /* Datos del resumen */
+    .resumo-datos {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .resumo-dato-row {
+        grid-template-columns: 20px minmax(100px, auto) 1fr;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 13px;
+    }
+
+    .resumo-dato-icon {
+        font-size: 12px;
+    }
+
+    .resumo-dato-label {
+        font-size: 12px;
+    }
+
+    /* Totales del resumen */
+    .resumo-totais {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .resumo-total-row {
+        font-size: 14px;
+        padding: 6px 0;
+    }
+
 }
 
 /* ================= TABLETS: 768px - 991px ================= */
@@ -660,6 +752,33 @@
 
     .metodo-pago-group {
         grid-template-columns: 1fr 1fr;
+    }
+
+    /* Tipo de entrega en tablet: dos columnas */
+    .tipo-entrega-group {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* Resumen datos en tablet */
+    .resumo-dato-row {
+        grid-template-columns: 22px minmax(120px, auto) 1fr;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+}
+
+/* ================= DESKTOP PEQUEÑO: 992px - 1199px ================= */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+
+    .tipo-entrega-group {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .resumo-orden-box {
+        padding: 18px 22px;
     }
 
 }
