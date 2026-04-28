@@ -75,13 +75,13 @@ var CELULAR_EMPRESA = '5355135487';
 
 // Metadata de las categorías: nombre visible, icono y clave interna
 var CATEGORIAS = {
-    "burgers":     { nome: "Antimicrobianos", icone: "fas fa-capsules" },
-    "pizzas":      { nome: "Antiinflamatorios", icone: "fas fa-pills" },
-    "churrasco":   { nome: "Antialérgicos", icone: "fas fa-allergies" },
-    "steaks":      { nome: "Antihipertensivo", icone: "fas fa-heartbeat" },
-    "bebidas":     { nome: "Digestivos", icone: "fas fa-prescription-bottle" },
-    "sobremesas":  { nome: "Dermatológicos", icone: "fas fa-hand-holding-medical" },
-    "outros":      { nome: "Otros", icone: "fas fa-notes-medical" }
+    "burgers":     { nome: "Mercado", icone: "fas fa-store" },
+    "pizzas":      { nome: "Embutido", icone: "fas fa-bacon" },
+    "churrasco":   { nome: "Carnico", icone: "fas fa-drumstick-bite" },
+    "steaks":      { nome: "Harina-Levaduras", icone: "fas fa-bread-slice" },
+    "bebidas":     { nome: "Liquidos", icone: "fas fa-tint" },
+    "sobremesas":  { nome: "Aseo", icone: "fas fa-soap" },
+    "outros":      { nome: "Confituras", icone: "fas fa-candy-cane" }
 };
 
 cardapio.eventos = {
