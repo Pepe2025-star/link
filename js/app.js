@@ -78,7 +78,7 @@ var CATEGORIAS = {
     "burgers":     { nome: "Mercado", icone: "fas fa-store" },
     "pizzas":      { nome: "Embutido", icone: "fas fa-bacon" },
     "churrasco":   { nome: "Carnico", icone: "fas fa-drumstick-bite" },
-    "steaks":      { nome: "Harina-Levaduras", icone: "fas fa-bread-slice" },
+    "steaks":      { nome: "Harinas", icone: "fas fa-bread-slice" },
     "bebidas":     { nome: "Liquidos", icone: "fas fa-tint" },
     "sobremesas":  { nome: "Aseo", icone: "fas fa-soap" },
     "outros":      { nome: "Confituras", icone: "fas fa-candy-cane" }
@@ -121,7 +121,7 @@ cardapio.metodos = {
     atualizarContadoresCategorias: () => {
         $.each(CATEGORIAS, (key, info) => {
             let total = (MENU[key] || []).length;
-            let $badge = $("#menu-" + key + " .menu-count");
+            let $badge = $("#menu-" + key + " .categoria-count");
             if ($badge.length > 0) {
                 $badge.text(total);
             }
@@ -135,7 +135,7 @@ cardapio.metodos = {
         if (!vermais) {
             $("#txtBuscarProduto").val('');
             $("#btnLimparBusca").addClass('hidden');
-            $(".container-menu").removeClass('modo-busqueda');
+            $(".categorias-grid").removeClass('modo-busqueda');
         }
 
         var filtro = MENU[categoria] || [];
@@ -192,7 +192,7 @@ cardapio.metodos = {
         }
 
         // quitar el estado activo
-        $(".container-menu a").removeClass('active');
+        $(".categorias-grid .categoria-card").removeClass('active');
 
         // marcar el menú actual como activo
         $("#menu-" + categoria).addClass('active');
@@ -204,7 +204,7 @@ cardapio.metodos = {
 
     // asegura que la categoría activa sea visible en móvil (scroll horizontal)
     centrarCategoriaActiva: (categoria) => {
-        let $container = $(".container-menu");
+        let $container = $(".categorias-grid");
         let $activo = $("#menu-" + categoria);
         if ($activo.length > 0 && $container.length > 0) {
             let containerWidth = $container.width();
@@ -278,8 +278,8 @@ cardapio.metodos = {
         });
 
         // entrar en modo búsqueda
-        $(".container-menu").addClass('modo-busqueda');
-        $(".container-menu a").removeClass('active');
+        $(".categorias-grid").addClass('modo-busqueda');
+        $(".categorias-grid .categoria-card").removeClass('active');
         $("#btnVerMais").addClass('hidden');
 
         // renderizar resultados
@@ -290,7 +290,7 @@ cardapio.metodos = {
                 <div class="col-12 text-center empty-category">
                     <i class="fas fa-search"></i>
                     <p>Sin resultados para <b>"${$('<div/>').text(termo).html()}"</b>.</p>
-                    <p class="text-sm">Prueba con otro nombre de medicamento.</p>
+                    <p class="text-sm">Prueba con otro nombre de producto.</p>
                 </div>
             `);
             return;
@@ -329,8 +329,8 @@ cardapio.metodos = {
 
     // restaura la vista normal: categoría activa (o la primera por defecto)
     salirModoBusqueda: () => {
-        $(".container-menu").removeClass('modo-busqueda');
-        let ativo = $(".container-menu a.active").attr('id');
+        $(".categorias-grid").removeClass('modo-busqueda');
+        let ativo = $(".categorias-grid .categoria-card.active").attr('id');
         let categoria = ativo ? ativo.split('menu-')[1] : 'burgers';
         cardapio.metodos.obterItensCardapio(categoria);
     },
@@ -1408,7 +1408,7 @@ cardapio.metodos = {
             let subtotalItem = fmt(e.price * e.qntd);
             let precioUnit = fmt(e.price);
             texto += `\n${i + 1}. *${e.name}*`;
-            texto += `\n   • Cantidad: ${e.qntd}`;
+            texto += `\n   �� Cantidad: ${e.qntd}`;
             texto += `\n   • Precio unitario: MN$ ${precioUnit}`;
             texto += `\n   • Subtotal: MN$ ${subtotalItem}`;
         });

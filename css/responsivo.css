@@ -329,26 +329,66 @@
         padding-bottom: 50px;
     }
 
-    .container-menu {
-        overflow-x: auto;
-        overflow-y: hidden;
+    /* Categorías grid en móvil: scroll horizontal */
+    .categorias-grid-wrapper {
+        margin-bottom: 24px;
+    }
+
+    .categorias-grid {
         display: flex;
         flex-wrap: nowrap;
-        justify-content: flex-start;
-        padding-bottom: 15px;
         gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 12px;
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
     }
 
-    .container-menu .menu-categoria {
+    .categorias-grid::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .categorias-grid::-webkit-scrollbar-thumb {
+        background: var(--color-separate);
+        border-radius: 4px;
+    }
+
+    .categorias-grid::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .categoria-card {
         flex-shrink: 0;
-        padding: 10px 16px;
-        font-size: 13px;
+        width: 90px;
+        min-width: 90px;
+        max-width: 90px;
+        min-height: 100px;
+        padding: 14px 10px;
+        gap: 8px;
+        border-radius: 16px;
+        scroll-snap-align: start;
     }
 
-    .container-menu .menu-categoria .menu-label {
+    .categoria-icon-wrap {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .categoria-nombre {
+        font-size: 11px;
         white-space: nowrap;
+    }
+
+    .categoria-count {
+        top: 6px;
+        right: 6px;
+        min-width: 20px;
+        height: 18px;
+        font-size: 10px;
     }
 
     /* Tarjeta horizontal en móvil */
@@ -767,6 +807,17 @@
         font-size: 14px;
     }
 
+    /* Categorías en tablet: 4 columnas */
+    .categorias-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .categoria-card {
+        max-width: none;
+        min-height: 120px;
+    }
+
 }
 
 /* ================= DESKTOP PEQUEÑO: 992px - 1199px ================= */
@@ -779,6 +830,40 @@
 
     .resumo-orden-box {
         padding: 18px 22px;
+    }
+
+    /* Categorías en desktop pequeño */
+    .categorias-grid {
+        gap: 14px;
+    }
+
+    .categoria-card {
+        max-width: 130px;
+        padding: 18px 14px;
+    }
+
+}
+
+/* ================= DESKTOP GRANDE: 1200px+ ================= */
+@media (min-width: 1200px) {
+
+    .categorias-grid {
+        gap: 18px;
+    }
+
+    .categoria-card {
+        max-width: 145px;
+        min-height: 140px;
+    }
+
+    .categoria-icon-wrap {
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+    }
+
+    .categoria-nombre {
+        font-size: 14px;
     }
 
 }

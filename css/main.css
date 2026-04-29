@@ -248,69 +248,122 @@ a.navbar-brand {
 }
 
 /* ============================================= */
-/* ======  MENÚ DE CATEGORÍAS (mejorado)  ====== */
+/* ======  CATEGORÍAS GRID (nuevo diseño)  ===== */
 /* ============================================= */
 
-.container-menu {
+.categorias-grid-wrapper {
     margin-bottom: 40px;
+}
+
+.categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 16px;
+    justify-items: center;
+}
+
+.categoria-card {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-}
-
-.container-menu .menu-categoria {
-    display: inline-flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    padding: 12px 20px;
-    border-radius: 30px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 20px 16px;
+    width: 100%;
+    max-width: 140px;
+    min-height: 130px;
+    border-radius: 20px;
     background-color: var(--color-white);
-    color: var(--color-black) !important;
     border: 2px solid transparent;
-    box-shadow: 0px 6px 14px -6px rgba(0, 0, 0, 0.15);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+    box-shadow: 0px 8px 20px -8px rgba(0, 0, 0, 0.12);
     cursor: pointer;
-    margin-right: 0 !important;
+    transition: all 0.22s ease;
+    text-decoration: none !important;
+    position: relative;
 }
 
-.container-menu .menu-categoria:hover {
-    transform: translateY(-2px);
-    background-color: var(--color-secondary);
-    box-shadow: 0px 10px 18px -8px rgba(255, 123, 0, 0.35);
+.categoria-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0px 14px 28px -10px rgba(255, 123, 0, 0.3);
+    border-color: var(--color-secondary);
+    background-color: var(--color-white);
 }
 
-.container-menu .menu-categoria.active {
-    background-color: var(--color-primary);
-    color: var(--color-white) !important;
+.categoria-card.active {
+    background: linear-gradient(145deg, var(--color-primary), #e86e00);
     border-color: var(--color-primary);
-    box-shadow: 0px 10px 22px -8px rgba(255, 123, 0, 0.55);
+    box-shadow: 0px 12px 28px -8px rgba(255, 123, 0, 0.5);
+    transform: translateY(-4px);
 }
 
-.container-menu .menu-categoria .menu-icon {
-    font-size: 18px;
+.categoria-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    font-size: 22px;
+    transition: all 0.22s ease;
 }
 
-.container-menu .menu-categoria .menu-count {
+.categoria-card:hover .categoria-icon-wrap {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    transform: scale(1.08);
+}
+
+.categoria-card.active .categoria-icon-wrap {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: var(--color-white);
+}
+
+.categoria-nombre {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-black);
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.22s ease;
+}
+
+.categoria-card.active .categoria-nombre {
+    color: var(--color-white);
+}
+
+.categoria-count {
+    position: absolute;
+    top: 8px;
+    right: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 26px;
+    min-width: 24px;
     height: 22px;
-    padding: 0 7px;
+    padding: 0 6px;
     border-radius: 11px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     background-color: var(--color-secondary);
-    color: var(--color-black);
+    color: var(--color-primary);
     line-height: 1;
 }
 
-.container-menu .menu-categoria.active .menu-count {
-    background-color: var(--color-white);
+.categoria-card.active .categoria-count {
+    background-color: rgba(255, 255, 255, 0.95);
     color: var(--color-primary);
+}
+
+/* Modo búsqueda: atenuar categorías */
+.categorias-grid.modo-busqueda .categoria-card {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.categorias-grid.modo-busqueda .categoria-card.active {
+    opacity: 0.7;
 }
 
 /* ============================================= */
